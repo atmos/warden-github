@@ -3,6 +3,8 @@ require 'rubygems/specification'
 require 'date'
 require 'bundler'
 
+require 'lib/warden-github/version'
+
 task :default => [:spec]
 
 require 'spec/rake/spectask'
@@ -19,7 +21,7 @@ Spec::Rake::SpecTask.new do |t|
 end
 
 GEM = "warden-github"
-GEM_VERSION = "0.0.1"
+GEM_VERSION = Warden::Github::VERSION
 AUTHOR = "Corey Donohoe"
 EMAIL = "atmos@atmos.org"
 HOMEPAGE = "http://github.com/atmos/warden-github"
@@ -44,7 +46,7 @@ spec = Gem::Specification.new do |s|
   end
 
   s.require_path = 'lib'
-  s.files = %w(LICENSE README.md Rakefile) + Dir.glob("{lib}/**/*")
+  s.files = %w(LICENSE README.md) + Dir.glob("{lib}/**/*")
 end
 
 Rake::GemPackageTask.new(spec) do |pkg|
