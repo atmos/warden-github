@@ -1,5 +1,6 @@
 require 'warden'
 require 'oauth2'
+require 'json'
 
 module Warden
   module Github
