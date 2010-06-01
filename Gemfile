@@ -3,7 +3,7 @@ source :gemcutter
 group :runtime do
   gem 'warden',              '~>0.10'
   gem 'oauth2',              '~>0.0.8'
-  gem 'json',                '~>1.4.3'
+  gem 'json',                '>=1.0.0'
 end
 
 group :test do
