@@ -14,7 +14,7 @@ group :test do
   gem 'webrat',           '~>0.7.0'
   gem 'bundler',          '~>0.9.25'
   gem 'randexp',          '>=0.1.4'
-  gem 'addressable',      '~>2.1.2'
+  gem 'addressable',      '~>2.1.2', :require => 'addressable/uri'
   gem 'rack-test',        '~>0.5.3', :require => 'rack/test'
 end
 

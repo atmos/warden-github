@@ -8,28 +8,35 @@ Warden::Strategies.add(:github) do
   def authenticate!
     if params['code']
       begin
-        access_token = oauth_client.web_server.get_access_token(params['code'], :redirect_uri => callback_url)
+        access_token = access_token_for(params['code'])
         user = JSON.parse(access_token.get('/api/v2/json/user/show'))
         success!(Warden::Github::Oauth::User.new(user['user'], access_token.token))
       rescue OAuth2::HTTPError
-        %(<p>Outdated ?code=#{params[:code]}:</p><p>#{$!}</p><p><a href="/auth/github">Retry</a></p>)
+        %(<p>Outdated ?code=#{params['code']}:</p><p>#{$!}</p><p><a href="/auth/github">Retry</a></p>)
       end
     else
-      url = oauth_client.web_server.authorize_url(
-        :scope        => 'email,offline_access',
-        :redirect_uri => callback_url
-      )
-      throw(:halt, [ 302, {'Location' => url}, [ ]])
+      throw(:halt, [ 302, {'Location' => authorize_url}, [ ]])
     end
   end
 
   private
+
   def oauth_client
-    OAuth2::Client.new(env['warden'].config[:github_client_id],
-                       env['warden'].config[:github_secret],
-                       :site              => 'https://github.com',
-                       :authorize_path    => '/login/oauth/authorize',
-                       :access_token_path => '/login/oauth/access_token')
+    oauth_proxy.client
+  end
+
+  def authorize_url
+    oauth_proxy.authorize_url
+  end
+
+  def access_token_for(code)
+    oauth_proxy.access_token_for(code)
+  end
+
+  def oauth_proxy
+    @oauth_proxy ||= Warden::Github::Oauth::Proxy.new(env['warden'].config[:github_client_id],
+                                                      env['warden'].config[:github_secret],
+                                                      callback_url)
   end
 
   def callback_url

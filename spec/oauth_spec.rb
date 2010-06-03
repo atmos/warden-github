@@ -5,8 +5,9 @@ describe "Warden::Github" do
     response = get "/"
 
     uri = Addressable::URI.parse(response.headers["Location"])
-    uri.should_not be_nil
+
     uri.scheme.should eql('https')
+    uri.host.should eql('github.com')
 
     params = uri.query_values
     params['type'].should eql('web_server')

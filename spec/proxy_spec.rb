@@ -1,0 +1,32 @@
+require File.dirname(__FILE__) + '/spec_helper'
+
+describe "Warden::Github::Oauth::Proxy" do
+  before(:all) do
+    sha = Digest::SHA1.hexdigest(Time.now.to_s)
+    @proxy =  Warden::Github::Oauth::Proxy.new(sha[0..19], sha[0..39],
+                                               'http://example.org/auth/github/callback')
+  end
+
+  it "returns an authorize url" do
+    uri = Addressable::URI.parse(@proxy.authorize_url)
+
+    uri.scheme.should eql('https')
+    uri.host.should eql('github.com')
+
+    params = uri.query_values
+    params['type'].should eql('web_server')
+    params['scope'].should eql('email,offline_access')
+    params['client_id'].should match(/\w{20}/)
+    params['redirect_uri'].should eql('http://example.org/auth/github/callback')
+  end
+
+  it "has a client object" do
+    @proxy.client.should_not be_nil
+  end
+
+  it "returns access tokens" do
+    pending "this hits the network" do
+      lambda { @proxy.access_token_for(/\w{20}/.gen) }.should_not raise_error
+    end
+  end
+end
