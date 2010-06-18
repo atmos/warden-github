@@ -2,8 +2,9 @@ module Warden
   module Github
     module Oauth
       class Proxy
-        def initialize(client_id, secret, callback_url)
-          @client_id, @secret, @callback_url = client_id, secret, callback_url
+        attr_accessor :client_id, :secret, :scopes, :callback_url
+        def initialize(client_id, secret, scopes, callback_url)
+          @client_id, @secret, @scopes, @callback_url = client_id, secret, scopes, callback_url
         end
 
         def client
@@ -14,13 +15,13 @@ module Warden
         end
 
         def access_token_for(code)
-          web_server.get_access_token(code, :redirect_uri => @callback_url)
+          web_server.get_access_token(code, :redirect_uri => callback_url)
         end
 
         def authorize_url
           web_server.authorize_url(
-            :scope        => 'email,offline_access',
-            :redirect_uri => @callback_url
+            :scope        => scopes,
+            :redirect_uri => callback_url
           )
         end
 

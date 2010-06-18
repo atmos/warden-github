@@ -4,7 +4,7 @@ describe "Warden::Github::Oauth::Proxy" do
   before(:all) do
     sha = Digest::SHA1.hexdigest(Time.now.to_s)
     @proxy =  Warden::Github::Oauth::Proxy.new(sha[0..19], sha[0..39],
-                                               'http://example.org/auth/github/callback')
+                                               'email,offline_access,repo', 'http://example.org/auth/github/callback')
   end
 
   it "returns an authorize url" do
@@ -15,7 +15,7 @@ describe "Warden::Github::Oauth::Proxy" do
 
     params = uri.query_values
     params['type'].should eql('web_server')
-    params['scope'].should eql('email,offline_access')
+    params['scope'].should eql('email,offline_access,repo')
     params['client_id'].should match(/\w{20}/)
     params['redirect_uri'].should eql('http://example.org/auth/github/callback')
   end
