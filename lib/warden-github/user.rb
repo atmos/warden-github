@@ -10,6 +10,10 @@ module Warden
           attribs['name']
         end
 
+        def gravatar_id
+          attribs['gravatar_id']
+        end
+
         def email
           attribs['email']
         end
