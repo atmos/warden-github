@@ -9,6 +9,7 @@ rescue LoadError
 end
 
 Bundler.require(:runtime, :test)
+require "ruby-debug"
 
 $LOAD_PATH << File.dirname(__FILE__) + '/lib'
 require File.expand_path(File.join(File.dirname(__FILE__), 'lib', 'warden-github'))
