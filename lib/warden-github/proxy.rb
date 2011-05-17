@@ -7,8 +7,18 @@ module Warden
           @client_id, @secret, @scopes, @callback_url = client_id, secret, scopes, callback_url
         end
 
+        def ssl_options
+          ca_file = "/usr/lib/ssl/certs/ca-certificates.crt"
+          if File.exists?(ca_file)
+            { :ca_file => ca_file }
+          else
+            { :ca_file => ''}
+          end
+        end
+
         def client
           @client ||= OAuth2::Client.new(@client_id, @secret,
+                                         :ssl               => ssl_options,
                                          :site              => 'https://github.com',
                                          :authorize_path    => '/login/oauth/authorize',
                                          :access_token_path => '/login/oauth/access_token')
