@@ -3,7 +3,7 @@ $:.push File.expand_path("../lib", __FILE__)
 
 Gem::Specification.new do |s|
   s.name        = "warden-github"
-  s.version     = "0.0.9"
+  s.version     = "0.1.0"
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Corey Donohoe"]
   s.email       = ["atmos@atmos.org"]

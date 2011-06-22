@@ -15,6 +15,7 @@ Warden::Strategies.add(:github) do
         %(<p>Outdated ?code=#{params['code']}:</p><p>#{$!}</p><p><a href="/auth/github">Retry</a></p>)
       end
     else
+      env['rack.session']['return_to'] = env['REQUEST_URI']
       throw(:halt, [ 302, {'Location' => authorize_url}, [ ]])
     end
   end
@@ -41,7 +42,7 @@ Warden::Strategies.add(:github) do
   end
 
   def callback_url
-     absolute_url(request, env['warden'].config[:github_callback_url])
+    absolute_url(request, env['warden'].config[:github_callback_url])
   end
 
   def absolute_url(request, suffix = nil)
@@ -52,5 +53,15 @@ Warden::Strategies.add(:github) do
                   request.port == 443 ? "" : ":#{request.port}"
                 end
     "#{request.scheme}://#{request.host}#{port_part}#{suffix}"
+  end
+end
+
+Warden::Manager.after_authentication do |user, proxy, opts|
+  redirect_to = proxy.env['rack.session']['return_to']
+  proxy.env['rack.session'].delete('return_to')
+  if redirect_to
+    response = Rack::Response.new
+    response.redirect redirect_to
+    throw :warden, response.finish
   end
 end
