@@ -1,9 +1,11 @@
 # -*- encoding: utf-8 -*-
 $:.push File.expand_path("../lib", __FILE__)
 
+require 'warden-github/version'
+
 Gem::Specification.new do |s|
   s.name        = "warden-github"
-  s.version     = "0.1.0"
+  s.version     = Warden::Github::VERSION
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Corey Donohoe"]
   s.email       = ["atmos@atmos.org"]

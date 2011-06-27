@@ -55,13 +55,3 @@ Warden::Strategies.add(:github) do
     "#{request.scheme}://#{request.host}#{port_part}#{suffix}"
   end
 end
-
-Warden::Manager.after_authentication do |user, proxy, opts|
-  redirect_to = proxy.env['rack.session']['return_to']
-  proxy.env['rack.session'].delete('return_to')
-  if redirect_to
-    response = Rack::Response.new
-    response.redirect redirect_to
-    throw :warden, response.finish
-  end
-end
