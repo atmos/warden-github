@@ -15,7 +15,8 @@ group :test do
   gem 'webrat',           '~>0.7.0'
   gem 'bundler',          '~>1.0'
   gem 'randexp',          '>=0.1.4'
-  gem 'ruby-debug'
+  gem 'ruby-debug19',     :platforms => :ruby_19
+  gem 'ruby-debug',       :platforms => :ruby_18
   gem 'addressable',      '~>2.2.0', :require => 'addressable/uri'
   gem 'rack-test',        '~>0.5.3', :require => 'rack/test'
 end
