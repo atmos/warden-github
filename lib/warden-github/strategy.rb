@@ -16,7 +16,7 @@ Warden::Strategies.add(:github) do
       end
     else
       env['rack.session']['return_to'] = env['REQUEST_URI']
-      throw(:halt, [ 302, {'Location' => authorize_url}, [ ]])
+      throw(:warden, [ 302, {'Location' => authorize_url}, [ ]])
     end
   end
 

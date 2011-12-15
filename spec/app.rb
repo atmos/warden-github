@@ -11,7 +11,7 @@ module Example
       manager[:github_client_id]    = ENV['GITHUB_CLIENT_ID']     || 'ee9aa24b64d82c21535a'
       manager[:github_secret]       = ENV['GITHUB_CLIENT_SECRET'] || 'ed8ff0c54067aefb808dab1ca265865405d08d6f'
 
-      manager[:github_scopes]       = 'email,offline_access'
+      manager[:github_scopes]       = 'user,public_repo,repo,gist'
       manager[:github_callback_url] = '/auth/github/callback'
     end
 
