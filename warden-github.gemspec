@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency "json",   "~>1.5"
   s.add_dependency "warden", "~>1.0.4"
-  s.add_dependency "oauth2", "~>0.4.1"
+  s.add_dependency "oauth2", "~>0.5.2"
 
   s.add_development_dependency "rake"
   s.add_development_dependency "rspec",     "~>1.3.0"
