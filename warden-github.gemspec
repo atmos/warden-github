@@ -19,7 +19,7 @@ Gem::Specification.new do |s|
   s.add_dependency "warden", "~>1.0.4"
   s.add_dependency "oauth2", "~>0.5.2"
 
-  s.add_development_dependency "rack",      "~>1.3.0"
+  s.add_development_dependency "rack"
   s.add_development_dependency "rake"
   s.add_development_dependency "rspec",     "~>1.3.0"
   s.add_development_dependency "webrat"
