@@ -1,3 +1,5 @@
+require 'sinatra'
+
 module Example
   class App < Sinatra::Base
     enable  :sessions
