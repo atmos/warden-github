@@ -11,7 +11,7 @@ Warden::Strategies.add(:github) do
         access_token = access_token_for(params['code'])
         user = JSON.parse(access_token.get('/api/v2/json/user/show'))
         success!(Warden::Github::Oauth::User.new(user['user'], access_token.token))
-      rescue OAuth2::HTTPError
+      rescue OAuth2::Error
         %(<p>Outdated ?code=#{params['code']}:</p><p>#{$!}</p><p><a href="/auth/github">Retry</a></p>)
       end
     else

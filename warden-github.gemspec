@@ -21,6 +21,7 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency "rake"
   s.add_development_dependency "rspec",     "~>1.3.0"
+  s.add_development_dependency "sinatra"
   s.add_development_dependency "shotgun"
   s.add_development_dependency "bundler",   "~>1.0"
   s.add_development_dependency "addressable", "~>2.2.0"

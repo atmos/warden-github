@@ -25,7 +25,7 @@ module Warden
         end
 
         def access_token_for(code)
-          web_server.get_access_token(code, :redirect_uri => callback_url)
+          web_server.get_token(code, :redirect_uri => callback_url)
         end
 
         def authorize_url
@@ -36,7 +36,7 @@ module Warden
         end
 
         def web_server
-          client.web_server
+          client.auth_code
         end
       end
     end
