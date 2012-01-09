@@ -11,4 +11,4 @@ The Extension in Action
 =======================
     % gem install bundler
     % bundle install
-    % GITHUB_CLIENT_ID="<from GH>" GITHUB_CLIENT_SECRET="<from GH>" bundle exec rackup
+    % GITHUB_CLIENT_ID="<from GH>" GITHUB_CLIENT_SECRET="<from GH>" bundle exec rackup -p9393 -E none

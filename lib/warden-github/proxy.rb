@@ -18,25 +18,21 @@ module Warden
 
         def client
           @client ||= OAuth2::Client.new(@client_id, @secret,
-                                         :ssl               => ssl_options,
-                                         :site              => 'https://github.com',
-                                         :authorize_path    => '/login/oauth/authorize',
-                                         :access_token_path => '/login/oauth/access_token')
+                                         :ssl           => ssl_options,
+                                         :site          => 'https://github.com',
+                                         :token_url     => '/login/oauth/access_token',
+                                         :authorize_url => '/login/oauth/authorize')
         end
 
-        def access_token_for(code)
-          web_server.get_token(code, :redirect_uri => callback_url)
+        def api_for(code)
+          client.auth_code.get_token(code, :redirect_uri => callback_url)
         end
 
         def authorize_url
-          web_server.authorize_url(
+          client.auth_code.authorize_url(
             :scope        => scopes,
             :redirect_uri => callback_url
           )
-        end
-
-        def web_server
-          client.auth_code
         end
       end
     end

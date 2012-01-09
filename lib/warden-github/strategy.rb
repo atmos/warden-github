@@ -8,9 +8,14 @@ Warden::Strategies.add(:github) do
   def authenticate!
     if params['code']
       begin
-        access_token = access_token_for(params['code'])
-        user = JSON.parse(access_token.get('/api/v2/json/user/show'))
-        success!(Warden::Github::Oauth::User.new(user['user'], access_token.token))
+        api = api_for(params['code'])
+
+        resp = api.get '/api/v2/json/user/show' do |request|
+          request.params['access_token'] = api.token
+        end.body
+
+        user = JSON.load(resp)
+        success!(Warden::Github::Oauth::User.new(user['user'], api.token))
       rescue OAuth2::Error
         %(<p>Outdated ?code=#{params['code']}:</p><p>#{$!}</p><p><a href="/auth/github">Retry</a></p>)
       end
@@ -30,8 +35,8 @@ Warden::Strategies.add(:github) do
     oauth_proxy.authorize_url
   end
 
-  def access_token_for(code)
-    oauth_proxy.access_token_for(code)
+  def api_for(code)
+    oauth_proxy.api_for(code)
   end
 
   def oauth_proxy
