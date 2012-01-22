@@ -12,7 +12,7 @@ Webrat.configure do |config|
   config.application_port = 4567
 end
 
-Spec::Runner.configure do |config|
+RSpec.configure do |config|
   config.include(Rack::Test::Methods)
   config.include(Webrat::Methods)
   config.include(Webrat::Matchers)

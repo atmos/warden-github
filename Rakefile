@@ -3,14 +3,10 @@ require 'rubygems/specification'
 require 'date'
 require 'bundler'
 
-require 'lib/warden-github/version'
-
 task :default => [:spec]
 
-require 'spec/rake/spectask'
+require 'rspec/core/rake_task'
 desc "Run specs"
-Spec::Rake::SpecTask.new do |t|
-  t.spec_files = FileList['spec/**/*_spec.rb']
-  t.spec_opts = %w(-fs --color)
-  t.spec_opts << '--loadby' << 'random'
+RSpec::Core::RakeTask.new do |t|
+  t.pattern = 'spec/**/*_spec.rb'
 end
