@@ -3,8 +3,6 @@ require 'rubygems/specification'
 require 'date'
 require 'bundler'
 
-require 'lib/warden-github/version'
-
 task :default => [:spec]
 
 require 'spec/rake/spectask'
