@@ -21,7 +21,7 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency "rack",      "~>1.4.0"
   s.add_development_dependency "rake"
-  s.add_development_dependency "rspec",     "~>1.3.0"
+  s.add_development_dependency "rspec",     "~>2.8.0"
   s.add_development_dependency "webrat"
   s.add_development_dependency "sinatra"
   s.add_development_dependency "shotgun"
