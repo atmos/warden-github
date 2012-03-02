@@ -2,9 +2,9 @@ module Warden
   module Github
     module Oauth
       class Proxy
-        attr_accessor :client_id, :secret, :scopes, :callback_url
-        def initialize(client_id, secret, scopes, callback_url)
-          @client_id, @secret, @scopes, @callback_url = client_id, secret, scopes, callback_url
+        attr_accessor :client_id, :secret, :scopes, :oauth_domain, :callback_url
+        def initialize(client_id, secret, scopes, oauth_domain, callback_url)
+          @client_id, @secret, @scopes, @oauth_domain, @callback_url = client_id, secret, scopes, oauth_domain, callback_url
         end
 
         def ssl_options
@@ -19,7 +19,7 @@ module Warden
         def client
           @client ||= OAuth2::Client.new(@client_id, @secret,
                                          :ssl           => ssl_options,
-                                         :site          => 'https://github.com',
+                                         :site          => oauth_domain,
                                          :token_url     => '/login/oauth/access_token',
                                          :authorize_url => '/login/oauth/authorize')
         end

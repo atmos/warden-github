@@ -43,6 +43,7 @@ Warden::Strategies.add(:github) do
     @oauth_proxy ||= Warden::Github::Oauth::Proxy.new(env['warden'].config[:github_client_id],
                                                       env['warden'].config[:github_secret],
                                                       env['warden'].config[:github_scopes],
+                                                      env['warden'].config[:github_oauth_domain],
                                                       callback_url)
   end
 
