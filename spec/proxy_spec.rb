@@ -5,6 +5,7 @@ describe "Warden::Github::Oauth::Proxy" do
     sha = Digest::SHA1.hexdigest(Time.now.to_s)
     @proxy =  Warden::Github::Oauth::Proxy.new(sha[0..19], sha[0..39],
                                                'user,public_repo,repo,gist',
+                                               'https://github.com/',
                                                'http://example.org/auth/github/callback')
   end
 
