@@ -58,6 +58,8 @@ Warden::Strategies.add(:github) do
                 when "https"
                   request.port == 443 ? "" : ":#{request.port}"
                 end
+
+    proto = "http" if proto.nil?
     "#{proto}://#{request.host}#{port_part}#{suffix}"
   end
 end
