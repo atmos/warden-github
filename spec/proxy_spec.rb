@@ -5,14 +5,15 @@ describe "Warden::Github::Oauth::Proxy" do
     sha = Digest::SHA1.hexdigest(Time.now.to_s)
     @proxy =  Warden::Github::Oauth::Proxy.new(sha[0..19], sha[0..39],
                                                'user,public_repo,repo,gist',
+                                               'http://example.org',
                                                'http://example.org/auth/github/callback')
   end
 
   it "returns an authorize url" do
     uri = Addressable::URI.parse(@proxy.authorize_url)
 
-    uri.scheme.should eql('https')
-    uri.host.should eql('github.com')
+    uri.scheme.should eql('http')
+    uri.host.should eql('example.org')
 
     params = uri.query_values
     params['response_type'].should eql('code')

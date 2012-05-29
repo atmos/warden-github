@@ -4,7 +4,7 @@ require File.join(File.dirname(__FILE__), '..', 'lib', 'warden-github')
 require File.join(File.dirname(__FILE__), 'app')
 require 'rack/test'
 require 'webrat'
-
+require 'addressable/uri'
 require 'pp'
 
 Webrat.configure do |config|

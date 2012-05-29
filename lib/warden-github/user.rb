@@ -21,6 +21,68 @@ module Warden
         def company
           attribs['company']
         end
+
+        # See if the user is a public member of the named organization
+        #
+        # name - the organization name
+        #
+        # Returns: true if the user is publicized as an org member
+        def publicized_organization_member?(org_name)
+          members = github_request("orgs/#{name}/public_members")
+          members.map { |org| org["login"] }.include?(login)
+        rescue RestClient::Forbidden, RestClient::Unauthorized, RestClient::ResourceNotFound => e
+          false
+        end
+
+        # See if the user is a member of the named organization
+        #
+        # name - the organization name
+        #
+        # Returns: true if the user has access, false otherwise
+        def organization_member?(name)
+          orgs = github_request("orgs/#{name}/members")
+          orgs.map { |org| org["login"] }.include?(github_user.login)
+        rescue RestClient::Forbidden, RestClient::Unauthorized, RestClient::ResourceNotFound => e
+          false
+        end
+
+        # See if the user is a member of the team id
+        #
+        # team_id - the team's id
+        #
+        # Returns: true if the user has access, false otherwise
+        def team_member?(team_id)
+          members = github_request("teams/#{team_id}/members")
+          members.map { |user| user["login"] }.include?(login)
+        rescue RestClient::Forbidden, RestClient::Unauthorized, RestClient::ResourceNotFound => e
+          false
+        end
+
+        # Send a V3 API GET request to path and parse the response body
+        #
+        # path - the path on api.github.com to hit
+        #
+        # Returns a parsed JSON response
+        #
+        # Examples
+        #   github_request("/user")
+        #   # => { 'login' => 'atmos', ... }
+        def github_request(path)
+          Yajl.load(github_raw_request(path))
+        end
+
+        # Send a V3 API GET request to path
+        #
+        # path - the path on api.github.com to hit
+        #
+        # Returns a rest client response object
+        #
+        # Examples
+        #   github_raw_request("/user")
+        #   # => RestClient::Response
+        def github_raw_request(path)
+          RestClient.get("#{github_api_uri}/#{path}", :params => { :access_token => token }, :accept => :json)
+        end
       end
     end
   end
