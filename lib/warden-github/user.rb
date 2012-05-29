@@ -1,3 +1,6 @@
+require 'yajl'
+require 'rest-client'
+
 module Warden
   module Github
     module Oauth
@@ -28,7 +31,7 @@ module Warden
         #
         # Returns: true if the user is publicized as an org member
         def publicized_organization_member?(org_name)
-          members = github_request("orgs/#{name}/public_members")
+          members = github_request("orgs/#{org_name}/public_members")
           members.map { |org| org["login"] }.include?(login)
         rescue RestClient::Forbidden, RestClient::Unauthorized, RestClient::ResourceNotFound => e
           false
@@ -39,9 +42,9 @@ module Warden
         # name - the organization name
         #
         # Returns: true if the user has access, false otherwise
-        def organization_member?(name)
-          orgs = github_request("orgs/#{name}/members")
-          orgs.map { |org| org["login"] }.include?(github_user.login)
+        def organization_member?(org_name)
+          orgs = github_request("orgs/#{org_name}/members")
+          orgs.map { |org| org["login"] }.include?(login)
         rescue RestClient::Forbidden, RestClient::Unauthorized, RestClient::ResourceNotFound => e
           false
         end
@@ -82,6 +85,15 @@ module Warden
         #   # => RestClient::Response
         def github_raw_request(path)
           RestClient.get("#{github_api_uri}/#{path}", :params => { :access_token => token }, :accept => :json)
+        end
+
+        private
+        def github_api_uri
+          if ENV['GITHUB_OAUTH_API_DOMAIN']
+            ENV['GITHUB_OAUTH_API_DOMAIN']
+          else
+            "https://api.github.com"
+          end
         end
       end
     end

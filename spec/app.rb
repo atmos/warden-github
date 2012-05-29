@@ -32,7 +32,12 @@ module Example
 
     get '/' do
       ensure_authenticated
-      "Hello There, #{user.name}!"
+      <<-EOS
+      <h2>Hello There, #{user.name}!</h2>
+      <h3>Rails Org Member: #{user.organization_member?('rails')}.</h3>
+      <h3>Publicized Rails Org Member: #{user.publicized_organization_member?('rails')}.</h3>
+      <h3>Rails Committer Team Member: #{user.team_member?(632)}.</h3>
+      EOS
     end
 
     get '/redirect_to' do
