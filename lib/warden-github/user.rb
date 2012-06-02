@@ -64,14 +64,18 @@ module Warden
         # Send a V3 API GET request to path and parse the response body
         #
         # path - the path on api.github.com to hit
+        # params - extra params for calling the api
         #
         # Returns a parsed JSON response
         #
         # Examples
         #   github_request("/user")
         #   # => { 'login' => 'atmos', ... }
-        def github_request(path)
-          Yajl.load(github_raw_request(path))
+        #
+        #   github_request("/user/repos", {:page => 2})
+        #   # => [ { 'name' => 'gollum' ... } ]
+        def github_request(path, params = {})
+          Yajl.load(github_raw_request(path, params))
         end
 
         # Send a V3 API GET request to path
@@ -83,8 +87,11 @@ module Warden
         # Examples
         #   github_raw_request("/user")
         #   # => RestClient::Response
-        def github_raw_request(path)
-          RestClient.get("#{github_api_uri}/#{path}", :params => { :access_token => token }, :accept => :json)
+        #
+        #   github_raw_request("/user/repos", {:page => 3})
+        #   # => RestClient::Response
+        def github_raw_request(path, params = {})
+          RestClient.get("#{github_api_uri}/#{path}", :params => params.merge({ :access_token => token }), :accept => :json)
         end
 
         private
