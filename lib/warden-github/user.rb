@@ -1,4 +1,5 @@
 require 'yajl'
+require 'octokit'
 require 'rest-client'
 
 module Warden
@@ -61,6 +62,58 @@ module Warden
           false
         end
 
+        # Send a V3 API PUT request to path and parses the response body
+        #
+        # path - the path on api.github.com to hit
+        # params - extra params for calling the api
+        #
+        def get(path, params)
+          github_request(path, params)
+        end
+
+        # Send a V3 API PUT request to path and parses the response body
+        #
+        # path - the path on api.github.com to hit
+        # params - extra params for calling the api
+        #
+        def post(path, params)
+          headers = {:Authorization => "token #{user.token}", :content_type => :json, :accept => :json}
+          res = RestClient.post("#{github_api_uri}/#{path}", params.to_json, headers)
+          Yajl.load(res)
+        end
+
+        # Send a V3 API PUT request to path and parses the response body
+        #
+        # path - the path on api.github.com to hit
+        # params - extra params for calling the api
+        #
+        def put(path, params)
+          headers = {:Authorization => "token #{user.token}", :content_type => :json, :accept => :json}
+          res = RestClient.put("#{github_api_uri}/#{path}", params.to_json, headers)
+          Yajl.load(res)
+        end
+
+        # Send a V3 API DELETE request to path and parses the response body
+        #
+        # path - the path on api.github.com to hit
+        # params - extra params for calling the api
+        #
+        def delete(path, params)
+          headers = {:Authorization => "token #{user.token}", :content_type => :json, :accept => :json}
+          res = RestClient.delete("#{github_api_uri}/#{path}", params.to_json, headers)
+          Yajl.load(res)
+        end
+
+        # Access the GitHub API from Octokit
+        #
+        # Octokit is a robust client library for the GitHub API
+        # https://github.com/pengwynn/octokit
+        #
+        # Returns a cached client object for easy use
+        def api
+          @api ||= Octokit::Client.new(:login => login, :oauth_token => token)
+        end
+
         # Send a V3 API GET request to path and parse the response body
         #
         # path - the path on api.github.com to hit
@@ -91,7 +144,8 @@ module Warden
         #   github_raw_request("/user/repos", {:page => 3})
         #   # => RestClient::Response
         def github_raw_request(path, params = {})
-          RestClient.get("#{github_api_uri}/#{path}", :params => params.merge({ :access_token => token }), :accept => :json)
+          headers = {:Authorization => "token #{token}", :accept => :json}
+          RestClient.get("#{github_api_uri}/#{path}", headers.merge(:params => params))
         end
 
         private
