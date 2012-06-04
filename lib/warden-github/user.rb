@@ -77,7 +77,7 @@ module Warden
         # params - extra params for calling the api
         #
         def post(path, params)
-          headers = {:Authorization => "token #{user.token}", :content_type => :json, :accept => :json}
+          headers = {:Authorization => "token #{token}", :content_type => :json, :accept => :json}
           res = RestClient.post("#{github_api_uri}/#{path}", params.to_json, headers)
           Yajl.load(res)
         end
@@ -88,7 +88,7 @@ module Warden
         # params - extra params for calling the api
         #
         def put(path, params)
-          headers = {:Authorization => "token #{user.token}", :content_type => :json, :accept => :json}
+          headers = {:Authorization => "token #{token}", :content_type => :json, :accept => :json}
           res = RestClient.put("#{github_api_uri}/#{path}", params.to_json, headers)
           Yajl.load(res)
         end
@@ -99,7 +99,7 @@ module Warden
         # params - extra params for calling the api
         #
         def delete(path, params)
-          headers = {:Authorization => "token #{user.token}", :content_type => :json, :accept => :json}
+          headers = {:Authorization => "token #{token}", :content_type => :json, :accept => :json}
           res = RestClient.delete("#{github_api_uri}/#{path}", params.to_json, headers)
           Yajl.load(res)
         end
