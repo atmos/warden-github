@@ -10,12 +10,7 @@ Warden::Strategies.add(:github) do
       begin
         api = api_for(params['code'])
 
-        resp = api.get '/api/v2/json/user/show' do |request|
-          request.params['access_token'] = api.token
-        end.body
-
-        user = JSON.load(resp)
-        success!(Warden::Github::Oauth::User.new(user['user'], api.token))
+        success!(Warden::Github::Oauth::User.new(Yajl.load(user_info_for(api.token)), api.token))
       rescue OAuth2::Error
         %(<p>Outdated ?code=#{params['code']}:</p><p>#{$!}</p><p><a href="/auth/github">Retry</a></p>)
       end
@@ -45,6 +40,10 @@ Warden::Strategies.add(:github) do
                                                       env['warden'].config[:github_scopes],
                                                       env['warden'].config[:github_oauth_domain],
                                                       callback_url)
+  end
+
+  def user_info_for(token)
+    @user_info ||= RestClient.get("https://api.github.com/user", :params => {:access_token => token})
   end
 
   def callback_url
