@@ -10,7 +10,7 @@ Warden::Strategies.add(:github) do
       begin
         api = api_for(params['code'])
 
-        resp = api.post '/login/oauth/access_token' do |request|
+        resp = api.get '/user' do |request|
           request.params['access_token'] = api.token
         end.body
 
