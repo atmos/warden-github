@@ -29,7 +29,7 @@ module Warden
         end
 
         def state
-          Digest::SHA1.hexdigest(rand(36**8).to_s(36))
+          @state ||= Digest::SHA1.hexdigest(rand(36**8).to_s(36))
         end
 
         def authorize_url

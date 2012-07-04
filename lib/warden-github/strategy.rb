@@ -6,7 +6,8 @@ Warden::Strategies.add(:github) do
   end
 
   def authenticate!
-    if params['code']
+    if(params['code'] && params['state'] &&
+       params['state'] == env['rack.session']['github_oauth_state'])
       begin
         api = api_for(params['code'])
 
@@ -15,7 +16,7 @@ Warden::Strategies.add(:github) do
         %(<p>Outdated ?code=#{params['code']}:</p><p>#{$!}</p><p><a href="/auth/github">Retry</a></p>)
       end
     else
-      env['rack.session']['state'] = state
+      env['rack.session']['github_oauth_state'] = state
       env['rack.session']['return_to'] = env['REQUEST_URI']
       throw(:warden, [ 302, {'Location' => authorize_url}, [ ]])
     end
