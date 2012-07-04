@@ -15,12 +15,17 @@ Warden::Strategies.add(:github) do
         %(<p>Outdated ?code=#{params['code']}:</p><p>#{$!}</p><p><a href="/auth/github">Retry</a></p>)
       end
     else
+      env['rack.session']['state'] = state
       env['rack.session']['return_to'] = env['REQUEST_URI']
       throw(:warden, [ 302, {'Location' => authorize_url}, [ ]])
     end
   end
 
   private
+
+  def state
+    oauth_proxy.state
+  end
 
   def oauth_client
     oauth_proxy.client
