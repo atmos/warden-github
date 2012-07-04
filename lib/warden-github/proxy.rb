@@ -28,8 +28,13 @@ module Warden
           client.auth_code.get_token(code, :redirect_uri => callback_url)
         end
 
+        def state
+          @state ||= Digest::SHA1.hexdigest(rand(36**8).to_s(36))
+        end
+
         def authorize_url
           client.auth_code.authorize_url(
+            :state        => state,
             :scope        => scopes,
             :redirect_uri => callback_url
           )
