@@ -7,6 +7,7 @@ Warden::Strategies.add(:github) do
 
   def authenticate!
     if(params['code'] && params['state'] &&
+       env['rack.session']['github_oauth_state'].any? &&
        params['state'] == env['rack.session']['github_oauth_state'])
       begin
         api = api_for(params['code'])
