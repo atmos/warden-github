@@ -20,13 +20,13 @@ module Example
 
     helpers do
       def ensure_authenticated
-        unless env['warden'].authenticate!
+        unless env['d2816'].authenticate!
           throw(:warden)
         end
       end
 
       def user
-        env['warden'].user
+        env['d2816].user
       end
     end
 
