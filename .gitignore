@@ -5,3 +5,4 @@ pkg
 Gemfile.lock
 vendor/gems
 *.gem
+.rbenv-version
