@@ -6,9 +6,9 @@ module Warden
   module Github
     module Oauth
       class User < Struct.new(:attribs, :token)
-        def initialize(attribs, token)
-          attribs.delete('bio') # Delete bio, as it can easily make the session cookie too long.
-          super
+        def initialize(attributes, api_token)
+          attributes.delete('bio') # Delete bio, as it can easily make the session cookie too long.
+          super(attributes, api_token)
         end
 
         def login
