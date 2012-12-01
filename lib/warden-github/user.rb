@@ -32,8 +32,7 @@ module Warden
         #
         # Returns: true if the user is publicized as an org member
         def publicized_organization_member?(org_name)
-          members = github_request("orgs/#{org_name}/public_members")
-          members.map { |org| org["login"] }.include?(login)
+          github_raw_request("orgs/#{org_name}/public_members/#{login}").code == 204
         rescue RestClient::Forbidden, RestClient::Unauthorized, RestClient::ResourceNotFound => e
           false
         end
@@ -44,8 +43,7 @@ module Warden
         #
         # Returns: true if the user has access, false otherwise
         def organization_member?(org_name)
-          orgs = github_request("orgs/#{org_name}/members")
-          orgs.map { |org| org["login"] }.include?(login)
+          github_raw_request("orgs/#{org_name}/members/#{login}").code == 204
         rescue RestClient::Forbidden, RestClient::Unauthorized, RestClient::ResourceNotFound => e
           false
         end
@@ -56,8 +54,7 @@ module Warden
         #
         # Returns: true if the user has access, false otherwise
         def team_member?(team_id)
-          members = github_request("teams/#{team_id}/members")
-          members.map { |user| user["login"] }.include?(login)
+          github_raw_request("teams/#{team_id}/members/#{login}").code == 204
         rescue RestClient::Forbidden, RestClient::Unauthorized, RestClient::ResourceNotFound => e
           false
         end
