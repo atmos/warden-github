@@ -22,7 +22,7 @@ Gem::Specification.new do |s|
   s.add_dependency "rest-client", "~>1.6.1"
   s.add_dependency "yajl-ruby",     "~>1.1"
 
-  s.add_development_dependency "rack",      "~>1.4.0"
+  s.add_development_dependency "rack",      "~>1.4.1"
   s.add_development_dependency "rake"
   s.add_development_dependency "rspec",     "~>2.8.0"
   s.add_development_dependency "webrat"
