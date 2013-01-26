@@ -54,7 +54,7 @@ Warden::Strategies.add(:github) do
   end
 
   def user_info_for(token)
-    @user_info ||= RestClient.get("https://api.github.com/user", :params => {:access_token => token})
+    @user_info ||= RestClient.get(github_api_uri + "/user", :params => {:access_token => token})
   end
 
   def callback_url
@@ -72,4 +72,13 @@ Warden::Strategies.add(:github) do
     proto = "http" if proto.nil?
     "#{proto}://#{request.host}#{port_part}#{suffix}"
   end
+
+  def github_api_uri
+    if ENV['GITHUB_OAUTH_API_DOMAIN']
+      ENV['GITHUB_OAUTH_API_DOMAIN']
+    else
+      "https://api.github.com"
+    end
+  end
+
 end
