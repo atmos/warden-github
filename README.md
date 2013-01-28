@@ -7,6 +7,11 @@ To test it out on localhost set your callback url to 'http://localhost:9292/auth
 
 There's an example app in [spec/app.rb](/atmos/warden-github/blob/master/spec/app.rb).
 
+Using with GitHub Enterprise
+============================
+
+Export the `OCTOKIT_API_ENDPOINT` environmental variable to the URL of your enterprise install.
+
 The Extension in Action
 =======================
     % gem install bundler
