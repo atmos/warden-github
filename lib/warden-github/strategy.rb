@@ -74,11 +74,10 @@ Warden::Strategies.add(:github) do
   end
 
   def github_api_uri
-    if ENV['GITHUB_OAUTH_API_DOMAIN']
-      ENV['GITHUB_OAUTH_API_DOMAIN']
+    if ENV['OCTOKIT_API_ENDPOINT']
+      ENV['OCTOKIT_API_ENDPOINT']
     else
       "https://api.github.com"
     end
   end
-
 end
