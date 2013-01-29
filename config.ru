@@ -16,5 +16,3 @@ require File.expand_path(File.join(File.dirname(__FILE__), 'lib', 'warden/github
 require File.expand_path(File.join(File.dirname(__FILE__), 'spec', 'app'))
 
 run Example.app
-
-# vim:ft=ruby
