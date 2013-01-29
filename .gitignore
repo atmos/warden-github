@@ -6,3 +6,5 @@ Gemfile.lock
 vendor/gems
 *.gem
 .rbenv-version
+bin/
+tags
