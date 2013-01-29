@@ -1,5 +1,3 @@
-Bundler.require(:default, :runtime, :test)
-
 require 'warden/github'
 require 'app'
 require 'rack/test'

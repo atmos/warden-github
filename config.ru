@@ -8,8 +8,6 @@ rescue LoadError
   Bundler.setup
 end
 
-Bundler.require(:runtime, :test)
-
 begin
   require 'debugger'
 rescue LoadError
