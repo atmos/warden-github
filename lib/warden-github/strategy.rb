@@ -16,7 +16,7 @@ Warden::Strategies.add(:github) do
         user_info = Yajl.load(user_info_for(api.token))
         user_info.delete('bio') # Delete bio, as it can easily make the session cookie too long.
 
-        success!(Warden::Github::Oauth::User.new(user_info, api.token))
+        success!(Warden::Github::User.new(user_info, api.token))
       rescue OAuth2::Error
         %(<p>Outdated ?code=#{params['code']}:</p><p>#{$!}</p><p><a href="/auth/github">Retry</a></p>)
       end
@@ -46,11 +46,11 @@ Warden::Strategies.add(:github) do
   end
 
   def oauth_proxy
-    @oauth_proxy ||= Warden::Github::Oauth::Proxy.new(env['warden'].config[:github_client_id],
-                                                      env['warden'].config[:github_secret],
-                                                      env['warden'].config[:github_scopes],
-                                                      env['warden'].config[:github_oauth_domain],
-                                                      callback_url)
+    @oauth_proxy ||= Warden::Github::Proxy.new(env['warden'].config[:github_client_id],
+                                               env['warden'].config[:github_secret],
+                                               env['warden'].config[:github_scopes],
+                                               env['warden'].config[:github_oauth_domain],
+                                               callback_url)
   end
 
   def user_info_for(token)

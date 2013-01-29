@@ -1,12 +1,12 @@
 require File.dirname(__FILE__) + '/spec_helper'
 
-describe "Warden::Github::Oauth::Proxy" do
+describe "Warden::Github::Proxy" do
   before(:all) do
     sha = Digest::SHA1.hexdigest(Time.now.to_s)
-    @proxy =  Warden::Github::Oauth::Proxy.new(sha[0..19], sha[0..39],
-                                               'user,public_repo,repo,gist',
-                                               'http://example.org',
-                                               'http://example.org/auth/github/callback')
+    @proxy =  Warden::Github::Proxy.new(sha[0..19], sha[0..39],
+                                        'user,public_repo,repo,gist',
+                                        'http://example.org',
+                                        'http://example.org/auth/github/callback')
   end
 
   it "returns an authorize url" do
