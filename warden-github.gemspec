@@ -5,7 +5,7 @@ require 'warden-github/version'
 
 Gem::Specification.new do |s|
   s.name        = "warden-github"
-  s.version     = Warden::Github::VERSION
+  s.version     = Warden::GitHub::VERSION
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Corey Donohoe"]
   s.email       = ["atmos@atmos.org"]

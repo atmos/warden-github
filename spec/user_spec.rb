@@ -1,8 +1,8 @@
 require File.dirname(__FILE__) + '/spec_helper'
 
-describe Warden::Github::User do
+describe Warden::GitHub::User do
   let(:user) do
-    Warden::Github::User.new({'login' => 'atmos'}, 'abcde')
+    Warden::GitHub::User.new({'login' => 'atmos'}, 'abcde')
   end
 
   it "knows the token" do

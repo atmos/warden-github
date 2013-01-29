@@ -3,8 +3,8 @@ require 'oauth2'
 require 'yajl'
 
 module Warden
-  module Github
-    class GithubMisconfiguredError < StandardError; end
+  module GitHub
+    class GitHubMisconfiguredError < StandardError; end
   end
 end
 

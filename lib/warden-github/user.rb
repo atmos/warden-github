@@ -3,7 +3,7 @@ require 'octokit'
 require 'rest-client'
 
 module Warden
-  module Github
+  module GitHub
     class User < Struct.new(:attribs, :token)
       def login
         attribs['login']
