@@ -1,7 +1,5 @@
-Bundler.require(:default, :runtime, :test)
-
-require File.join(File.dirname(__FILE__), '..', 'lib', 'warden-github')
-require File.join(File.dirname(__FILE__), 'app')
+require 'warden/github'
+require File.expand_path('../../example/app', __FILE__)
 require 'rack/test'
 require 'webrat'
 require 'addressable/uri'

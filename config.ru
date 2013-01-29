@@ -8,13 +8,13 @@ rescue LoadError
   Bundler.setup
 end
 
-Bundler.require(:runtime, :test)
-require "ruby-debug"
+begin
+  require 'debugger'
+rescue LoadError
+  require 'ruby-debug'
+end
 
-$LOAD_PATH << File.dirname(__FILE__) + '/lib'
-require File.expand_path(File.join(File.dirname(__FILE__), 'lib', 'warden-github'))
-require File.expand_path(File.join(File.dirname(__FILE__), 'spec', 'app'))
+require 'warden/github'
+require File.expand_path('../example/app', __FILE__)
 
 run Example.app
-
-# vim:ft=ruby
