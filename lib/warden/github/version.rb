@@ -1,5 +1,5 @@
 module Warden
-  module Github
+  module GitHub
     VERSION = "0.12.1"
   end
 end
