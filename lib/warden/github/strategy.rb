@@ -23,7 +23,7 @@ Warden::Strategies.add(:github) do
     else
       env['rack.session']['github_oauth_state'] = state
       env['rack.session']['return_to'] = env['REQUEST_URI']
-      throw(:warden, [ 302, {'Location' => authorize_url}, [ ]])
+      throw(:warden, [302, { 'Location' => authorize_url, 'Content-Type' => 'text/plain' }, []])
     end
   end
 
