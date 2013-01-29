@@ -1,6 +1,6 @@
 require File.dirname(__FILE__) + '/spec_helper'
 
-describe "Warden::Github" do
+describe Warden::Github::User do
   let(:user) do
     Warden::Github::User.new({'login' => 'atmos'}, 'abcde')
   end

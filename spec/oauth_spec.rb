@@ -1,6 +1,6 @@
 require File.dirname(__FILE__) + '/spec_helper'
 
-describe "Warden::Github" do
+describe Warden::Github do
   it "requesting an url that requires authentication redirects to github" do
     response = get "/"
 

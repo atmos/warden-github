@@ -1,6 +1,6 @@
 require File.dirname(__FILE__) + '/spec_helper'
 
-describe "Warden::Github::Proxy" do
+describe Warden::Github::Proxy do
   before(:all) do
     sha = Digest::SHA1.hexdigest(Time.now.to_s)
     @proxy =  Warden::Github::Proxy.new(sha[0..19], sha[0..39],
