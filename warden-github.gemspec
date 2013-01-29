@@ -1,7 +1,5 @@
 # -*- encoding: utf-8 -*-
-$:.push File.expand_path("../lib", __FILE__)
-
-require 'warden-github/version'
+require File.expand_path('../lib/warden-github/version', __FILE__)
 
 Gem::Specification.new do |s|
   s.name        = "warden-github"
