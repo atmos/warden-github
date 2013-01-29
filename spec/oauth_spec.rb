@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/spec_helper'
+require 'spec_helper'
 
 describe Warden::GitHub do
   it "requesting an url that requires authentication redirects to github" do
