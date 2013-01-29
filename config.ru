@@ -15,6 +15,6 @@ rescue LoadError
 end
 
 require 'warden/github'
-require File.expand_path(File.join(File.dirname(__FILE__), 'spec', 'app'))
+require File.expand_path('../example/app', __FILE__)
 
 run Example.app

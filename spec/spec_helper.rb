@@ -1,5 +1,5 @@
 require 'warden/github'
-require 'app'
+require File.expand_path('../../example/app', __FILE__)
 require 'rack/test'
 require 'webrat'
 require 'addressable/uri'
