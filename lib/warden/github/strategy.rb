@@ -102,7 +102,11 @@ module Warden
       end
 
       def callback_url
-        absolute_url(request, env['warden'].config[:github_callback_url], env['HTTP_X_FORWARDED_PROTO'])
+        absolute_url(request, callback_path, env['HTTP_X_FORWARDED_PROTO'])
+      end
+
+      def callback_path
+        env['warden'].config[:github_callback_url] || request.path
       end
 
       def absolute_url(request, suffix = nil, proto = "http")

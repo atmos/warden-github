@@ -15,7 +15,6 @@ module Example
 
       manager[:github_scopes]       = ''
       manager[:github_oauth_domain] = ENV['GITHUB_OAUTH_DOMAIN'] || 'https://github.com'
-      manager[:github_callback_url] = '/login'
     end
 
     helpers do

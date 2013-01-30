@@ -13,6 +13,6 @@ describe Warden::GitHub do
     params['response_type'].should eql('code')
     params['scope'].should eql('')
     params['client_id'].should match(/\w{20}/)
-    params['redirect_uri'].should eql('http://example.org/login')
+    params['redirect_uri'].should eql('http://example.org/profile')
   end
 end
