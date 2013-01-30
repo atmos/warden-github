@@ -12,12 +12,26 @@ module Warden
       #
       # If anything goes wrong, the flow is aborted and reset, and warden gets
       # notified about the failure.
+      #
+      # Once the user gets set, warden invokes the after_authentication callback
+      # that handles the redirect to the originally requested url and the cleans
+      # up the flow. Note that this is done in a hook because setting a user
+      # (through #success!) and redirecting (through #redirect!) inside the
+      # #authenticate! method are mutual exclusive.
       def authenticate!
         if in_flow?
-          finish_flow!
+          continue_flow!
         else
           begin_flow!
         end
+      end
+
+      # This is called by the after_authentication hook which is invoked after
+      # invoking #success!.
+      def finalize_flow!
+        redirect!(custom_session['return_to'])
+        teardown_flow
+        throw(:warden)
       end
 
       private
@@ -28,9 +42,8 @@ module Warden
         throw(:warden)
       end
 
-      def finish_flow!
+      def continue_flow!
         validate_flow!
-        teardown_flow
         success!(load_user)
       end
 
@@ -42,6 +55,7 @@ module Warden
 
       def setup_flow
         custom_session['state'] = state
+        custom_session['return_to'] = request.url
       end
 
       def teardown_flow
