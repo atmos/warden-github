@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Warden::GitHub do
   it "requesting an url that requires authentication redirects to github" do
-    response = get "/"
+    response = get "/profile"
 
     uri = Addressable::URI.parse(response.headers["Location"])
 
@@ -13,6 +13,6 @@ describe Warden::GitHub do
     params['response_type'].should eql('code')
     params['scope'].should eql('')
     params['client_id'].should match(/\w{20}/)
-    params['redirect_uri'].should eql('http://example.org/auth/github/callback')
+    params['redirect_uri'].should eql('http://example.org/login')
   end
 end
