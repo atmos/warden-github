@@ -1,35 +1,77 @@
 module Warden
   module GitHub
     class Strategy < ::Warden::Strategies::Base
-      # Need to make sure that we have a pure representation of the query string.
-      # Rails adds an "action" parameter which causes the openid gem to error
-      def params
-        @params ||= Rack::Utils.parse_query(request.query_string)
-      end
+      SESSION_KEY = 'warden.github.oauth'
 
+      # The first time this is called, the flow gets set up, stored in the
+      # session and the user gets redirected to GitHub to perform the login.
+      #
+      # When this is called a second time, the flow gets evaluated, the code
+      # gets exchanged for a token, and the user gets loaded and passed to
+      # warden.
+      #
+      # If anything goes wrong, the flow is aborted and reset, and warden gets
+      # notified about the failure.
       def authenticate!
-        if(params['code'] && params['state'] &&
-           env['rack.session']['github_oauth_state'] &&
-           env['rack.session']['github_oauth_state'].size > 0 &&
-           params['state'] == env['rack.session']['github_oauth_state'])
-          begin
-            api = api_for(params['code'])
-
-            user_info = Yajl.load(user_info_for(api.token))
-            user_info.delete('bio') # Delete bio, as it can easily make the session cookie too long.
-
-            success!(Warden::GitHub::User.new(user_info, api.token))
-          rescue OAuth2::Error
-            %(<p>Outdated ?code=#{params['code']}:</p><p>#{$!}</p><p><a href="/auth/github">Retry</a></p>)
-          end
+        if in_flow?
+          finish_flow!
         else
-          env['rack.session']['github_oauth_state'] = state
-          env['rack.session']['return_to'] = env['REQUEST_URI']
-          throw(:warden, [302, { 'Location' => authorize_url, 'Content-Type' => 'text/plain' }, []])
+          begin_flow!
         end
       end
 
       private
+
+      def begin_flow!
+        setup_flow
+        redirect!(authorize_url)
+        throw(:warden)
+      end
+
+      def finish_flow!
+        validate_flow!
+        teardown_flow
+        success!(load_user)
+      end
+
+      def abort_flow!(message)
+        teardown_flow
+        fail!(message)
+        throw(:warden)
+      end
+
+      def setup_flow
+        custom_session['state'] = state
+      end
+
+      def teardown_flow
+        session.delete(SESSION_KEY)
+      end
+
+      def in_flow?
+        !custom_session.empty? && params['state'] && params['code']
+      end
+
+      def validate_flow!
+        abort_flow!('State mismatch')  unless valid_state?
+      end
+
+      def valid_state?
+        params['state'] == custom_session['state']
+      end
+
+      def custom_session
+        session[SESSION_KEY] ||= {}
+      end
+
+      def load_user
+        api = api_for(params['code'])
+        user_info = Yajl.load(user_info_for(api.token))
+        user_info.delete('bio') # Delete bio, as it can easily make the session cookie too long.
+        User.new(user_info, api.token)
+      rescue OAuth2::Error
+        abort_flow!('Invalid code')
+      end
 
       def state
         oauth_proxy.state
