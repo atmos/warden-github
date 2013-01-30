@@ -1,83 +1,89 @@
-Warden::Strategies.add(:github) do
-  # Need to make sure that we have a pure representation of the query string.
-  # Rails adds an "action" parameter which causes the openid gem to error
-  def params
-    @params ||= Rack::Utils.parse_query(request.query_string)
-  end
-
-  def authenticate!
-    if(params['code'] && params['state'] &&
-       env['rack.session']['github_oauth_state'] &&
-       env['rack.session']['github_oauth_state'].size > 0 &&
-       params['state'] == env['rack.session']['github_oauth_state'])
-      begin
-        api = api_for(params['code'])
-
-        user_info = Yajl.load(user_info_for(api.token))
-        user_info.delete('bio') # Delete bio, as it can easily make the session cookie too long.
-
-        success!(Warden::GitHub::User.new(user_info, api.token))
-      rescue OAuth2::Error
-        %(<p>Outdated ?code=#{params['code']}:</p><p>#{$!}</p><p><a href="/auth/github">Retry</a></p>)
+module Warden
+  module GitHub
+    class Strategy < ::Warden::Strategies::Base
+      # Need to make sure that we have a pure representation of the query string.
+      # Rails adds an "action" parameter which causes the openid gem to error
+      def params
+        @params ||= Rack::Utils.parse_query(request.query_string)
       end
-    else
-      env['rack.session']['github_oauth_state'] = state
-      env['rack.session']['return_to'] = env['REQUEST_URI']
-      throw(:warden, [302, { 'Location' => authorize_url, 'Content-Type' => 'text/plain' }, []])
-    end
-  end
 
-  private
+      def authenticate!
+        if(params['code'] && params['state'] &&
+           env['rack.session']['github_oauth_state'] &&
+           env['rack.session']['github_oauth_state'].size > 0 &&
+           params['state'] == env['rack.session']['github_oauth_state'])
+          begin
+            api = api_for(params['code'])
 
-  def state
-    oauth_proxy.state
-  end
+            user_info = Yajl.load(user_info_for(api.token))
+            user_info.delete('bio') # Delete bio, as it can easily make the session cookie too long.
 
-  def oauth_client
-    oauth_proxy.client
-  end
+            success!(Warden::GitHub::User.new(user_info, api.token))
+          rescue OAuth2::Error
+            %(<p>Outdated ?code=#{params['code']}:</p><p>#{$!}</p><p><a href="/auth/github">Retry</a></p>)
+          end
+        else
+          env['rack.session']['github_oauth_state'] = state
+          env['rack.session']['return_to'] = env['REQUEST_URI']
+          throw(:warden, [302, { 'Location' => authorize_url, 'Content-Type' => 'text/plain' }, []])
+        end
+      end
 
-  def authorize_url
-    oauth_proxy.authorize_url
-  end
+      private
 
-  def api_for(code)
-    oauth_proxy.api_for(code)
-  end
+      def state
+        oauth_proxy.state
+      end
 
-  def oauth_proxy
-    @oauth_proxy ||= Warden::GitHub::Proxy.new(env['warden'].config[:github_client_id],
-                                               env['warden'].config[:github_secret],
-                                               env['warden'].config[:github_scopes],
-                                               env['warden'].config[:github_oauth_domain],
-                                               callback_url)
-  end
+      def oauth_client
+        oauth_proxy.client
+      end
 
-  def user_info_for(token)
-    @user_info ||= RestClient.get(github_api_uri + "/user", :params => {:access_token => token})
-  end
+      def authorize_url
+        oauth_proxy.authorize_url
+      end
 
-  def callback_url
-    absolute_url(request, env['warden'].config[:github_callback_url], env['HTTP_X_FORWARDED_PROTO'])
-  end
+      def api_for(code)
+        oauth_proxy.api_for(code)
+      end
 
-  def absolute_url(request, suffix = nil, proto = "http")
-    port_part = case request.scheme
-                when "http"
-                  request.port == 80 ? "" : ":#{request.port}"
-                when "https"
-                  request.port == 443 ? "" : ":#{request.port}"
-                end
+      def oauth_proxy
+        @oauth_proxy ||= Warden::GitHub::Proxy.new(env['warden'].config[:github_client_id],
+                                                   env['warden'].config[:github_secret],
+                                                   env['warden'].config[:github_scopes],
+                                                   env['warden'].config[:github_oauth_domain],
+                                                   callback_url)
+      end
 
-    proto = "http" if proto.nil?
-    "#{proto}://#{request.host}#{port_part}#{suffix}"
-  end
+      def user_info_for(token)
+        @user_info ||= RestClient.get(github_api_uri + "/user", :params => {:access_token => token})
+      end
 
-  def github_api_uri
-    if ENV['OCTOKIT_API_ENDPOINT']
-      ENV['OCTOKIT_API_ENDPOINT']
-    else
-      "https://api.github.com"
+      def callback_url
+        absolute_url(request, env['warden'].config[:github_callback_url], env['HTTP_X_FORWARDED_PROTO'])
+      end
+
+      def absolute_url(request, suffix = nil, proto = "http")
+        port_part = case request.scheme
+                    when "http"
+                      request.port == 80 ? "" : ":#{request.port}"
+                    when "https"
+                      request.port == 443 ? "" : ":#{request.port}"
+                    end
+
+        proto = "http" if proto.nil?
+        "#{proto}://#{request.host}#{port_part}#{suffix}"
+      end
+
+      def github_api_uri
+        if ENV['OCTOKIT_API_ENDPOINT']
+          ENV['OCTOKIT_API_ENDPOINT']
+        else
+          "https://api.github.com"
+        end
+      end
     end
   end
 end
+
+Warden::Strategies.add(:github, Warden::GitHub::Strategy)
