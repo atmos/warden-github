@@ -112,7 +112,9 @@ module Warden
       end
 
       def user_info_for(token)
-        @user_info ||= RestClient.get(github_api_uri + "/user", :params => {:access_token => token})
+        @user_info ||= RestClient.get(
+          Octokit::Configuration::DEFAULT_API_ENDPOINT + "user",
+          :params => {:access_token => token})
       end
 
       def callback_url
@@ -133,14 +135,6 @@ module Warden
 
         proto = "http" if proto.nil?
         "#{proto}://#{request.host}#{port_part}#{suffix}"
-      end
-
-      def github_api_uri
-        if ENV['OCTOKIT_API_ENDPOINT']
-          ENV['OCTOKIT_API_ENDPOINT']
-        else
-          "https://api.github.com"
-        end
       end
     end
   end

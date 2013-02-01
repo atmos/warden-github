@@ -16,7 +16,7 @@ Gem::Specification.new do |s|
   s.add_dependency "json",   "~>1.5"
   s.add_dependency "warden", "~>1.0"
   s.add_dependency "oauth2", "~>0.5.2"
-  s.add_dependency "octokit", "~>1.19.0"
+  s.add_dependency "octokit", "~>1.20.0"
   s.add_dependency "rest-client", "~>1.6.1"
   s.add_dependency "yajl-ruby",     "~>1.1"
 
