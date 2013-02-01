@@ -15,14 +15,14 @@ Gem::Specification.new do |s|
 
   s.add_dependency "json",   "~>1.5"
   s.add_dependency "warden", "~>1.0"
-  s.add_dependency "oauth2", "~>0.5.2"
   s.add_dependency "octokit", "~>1.20.0"
   s.add_dependency "rest-client", "~>1.6.1"
   s.add_dependency "yajl-ruby",     "~>1.1"
 
   s.add_development_dependency "rack",      "~>1.4.1"
   s.add_development_dependency "rake"
-  s.add_development_dependency "rspec",     "~>2.8.0"
+  s.add_development_dependency "rspec",     "~>2.8"
+  s.add_development_dependency "webmock",   "~>1.9"
   s.add_development_dependency "webrat"
   s.add_development_dependency "sinatra"
   s.add_development_dependency "shotgun"

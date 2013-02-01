@@ -38,7 +38,7 @@ module Warden
 
       def begin_flow!
         setup_flow
-        redirect!(authorize_url)
+        redirect!(oauth.authorize_uri.to_s)
         throw(:warden)
       end
 
@@ -71,7 +71,7 @@ module Warden
       end
 
       def valid_state?
-        params['state'] == custom_session['state']
+        params['state'] == state
       end
 
       def custom_session
@@ -79,36 +79,27 @@ module Warden
       end
 
       def load_user
-        api = api_for(params['code'])
-        user_info = Yajl.load(user_info_for(api.token))
+        user_info = Yajl.load(user_info_for(oauth.access_token))
         user_info.delete('bio') # Delete bio, as it can easily make the session cookie too long.
-        User.new(user_info, api.token)
-      rescue OAuth2::Error
-        abort_flow!('Invalid code')
+        User.new(user_info, oauth.access_token)
+      rescue OAuth::BadVerificationCode => e
+        abort_flow!(e.message)
       end
 
       def state
-        oauth_proxy.state
+        @state ||=
+          custom_session['state'] ||
+          Digest::SHA1.hexdigest(rand(36**8).to_s(36))
       end
 
-      def oauth_client
-        oauth_proxy.client
-      end
-
-      def authorize_url
-        oauth_proxy.authorize_url
-      end
-
-      def api_for(code)
-        oauth_proxy.api_for(code)
-      end
-
-      def oauth_proxy
-        @oauth_proxy ||= Warden::GitHub::Proxy.new(env['warden'].config[:github_client_id],
-                                                   env['warden'].config[:github_secret],
-                                                   env['warden'].config[:github_scopes],
-                                                   env['warden'].config[:github_oauth_domain],
-                                                   callback_url)
+      def oauth
+        @oauth ||= OAuth.new(
+          :code => params['code'],
+          :state => state,
+          :client_id => env['warden'].config[:github_client_id],
+          :client_secret => env['warden'].config[:github_secret],
+          :scope => env['warden'].config[:github_scopes],
+          :redirect_uri => redirect_uri)
       end
 
       def user_info_for(token)
@@ -117,15 +108,15 @@ module Warden
           :params => {:access_token => token})
       end
 
-      def callback_url
-        absolute_url(request, callback_path, env['HTTP_X_FORWARDED_PROTO'])
+      def redirect_uri
+        absolute_uri(request, callback_path, env['HTTP_X_FORWARDED_PROTO'])
       end
 
       def callback_path
         env['warden'].config[:github_callback_url] || request.path
       end
 
-      def absolute_url(request, suffix = nil, proto = "http")
+      def absolute_uri(request, suffix = nil, proto = "http")
         port_part = case request.scheme
                     when "http"
                       request.port == 80 ? "" : ":#{request.port}"
