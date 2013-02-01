@@ -15,7 +15,6 @@ module Example
 
       manager[:github_scopes]       = ''
       manager[:github_oauth_domain] = ENV['GITHUB_OAUTH_DOMAIN'] || 'https://github.com'
-      manager[:github_callback_url] = '/auth/github/callback'
     end
 
     helpers do
@@ -31,35 +30,63 @@ module Example
     end
 
     get '/' do
+      if user
+        <<-EOS
+        <h2>Hello #{user.name}!</h2>
+        <ul>
+          <li><a href='/profile'>View profile</a></li>
+          <li><a href='/logout'>Sign out</a></li>
+        </ul>
+        EOS
+      else
+        <<-EOS
+        <h2>Hello stranger!</h2>
+        <ul>
+          <li><a href='/profile'>View profile</a> (implicit sign in)</li>
+          <li><a href='/login'>Sign in</a> (explicit sign in)</li>
+        </ul>
+        EOS
+      end
+    end
+
+    get '/profile' do
       ensure_authenticated
       <<-EOS
-      <h2>Hello There, #{user.name}!</h2>
-      <h3>Rails Org Member: #{user.organization_member?('rails')}.</h3>
-      <h3>Publicized Rails Org Member: #{user.publicized_organization_member?('rails')}.</h3>
-      <h3>Rails Committer Team Member: #{user.team_member?(632)}.</h3>
+      <h2>Hello #{user.name}!</h2>
+      <ul>
+        <li><a href='/'>Home</a></li>
+        <li><a href='/logout'>Sign out</a></li>
+      </ul>
+      <h3>Profile</h3>
+      <h4>Rails Org Member: #{user.organization_member?('rails')}.</h4>
+      <h4>Publicized Rails Org Member: #{user.publicized_organization_member?('rails')}.</h4>
+      <h4>Rails Committer Team Member: #{user.team_member?(632)}.</h4>
       EOS
     end
 
-    get '/redirect_to' do
-      ensure_authenticated
-      "Hello There, #{user.name}! return_to is working!"
-    end
-
-    get '/auth/github/callback' do
+    get '/login' do
       ensure_authenticated
       redirect '/'
     end
 
     get '/logout' do
       env['warden'].logout
-      "Peace!"
+      redirect '/'
+    end
+
+    get '/debug' do
+      content_type :text
+      env['rack.session'].to_yaml
     end
   end
 
   class BadAuthentication < Sinatra::Base
     get '/unauthenticated' do
       status 403
-      "Unable to authenticate, sorry bud."
+      <<-EOS
+      <h2>Unable to authenticate, sorry bud.</h2>
+      <p>#{env['warden'].message}</p>
+      EOS
     end
   end
 
