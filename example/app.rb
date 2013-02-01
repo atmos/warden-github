@@ -1,4 +1,5 @@
 require 'sinatra'
+require 'json'
 
 module Example
   class App < Sinatra::Base
