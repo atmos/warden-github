@@ -1,5 +1,4 @@
 require 'warden'
-require 'yajl'
 
 require 'warden/github/user'
 require 'warden/github/oauth'

@@ -1,10 +1,14 @@
-require 'yajl'
 require 'octokit'
-require 'rest-client'
 
 module Warden
   module GitHub
     class User < Struct.new(:attribs, :token)
+      def self.load(access_token)
+        api = Octokit::Client.new(:oauth_token => access_token)
+
+        new(api.user.to_hash, access_token)
+      end
+
       def login
         attribs['login']
       end
@@ -30,11 +34,12 @@ module Warden
       # name - the organization name
       #
       # Returns: true if the user is publicized as an org member
-      def publicized_organization_member?(org_name)
-        github_raw_request("orgs/#{org_name}/public_members/#{login}").code == 204
-      rescue RestClient::Forbidden, RestClient::Unauthorized, RestClient::ResourceNotFound => e
-        false
+      def organization_public_member?(org_name)
+        api.organization_public_member?(org_name, login)
       end
+
+      # Backwards compatibility:
+      alias_method :publicized_organization_member?, :organization_public_member?
 
       # See if the user is a member of the named organization
       #
@@ -42,9 +47,7 @@ module Warden
       #
       # Returns: true if the user has access, false otherwise
       def organization_member?(org_name)
-        github_raw_request("orgs/#{org_name}/members/#{login}").code == 204
-      rescue RestClient::Forbidden, RestClient::Unauthorized, RestClient::ResourceNotFound => e
-        false
+        api.organization_member?(org_name, login)
       end
 
       # See if the user is a member of the team id
@@ -53,51 +56,18 @@ module Warden
       #
       # Returns: true if the user has access, false otherwise
       def team_member?(team_id)
-        github_raw_request("teams/#{team_id}/members/#{login}").code == 204
-      rescue RestClient::Forbidden, RestClient::Unauthorized, RestClient::ResourceNotFound => e
+        # TODO: Use next line as method body once pengwynn/octokit#206 is public.
+        # api.team_member?(team_id, login)
+
+        # If the user is able to query the team member
+        # A user is only able to query for team members if they're a member.
+        # Thus, if querying does succeed, they will be in the list and checking
+        # the list won't be necessary.
+        api.team_members(team_id)
+
+        true
+      rescue Octokit::NotFound
         false
-      end
-
-      # Send a V3 API PUT request to path and parses the response body
-      #
-      # path - the path on api.github.com to hit
-      # params - extra params for calling the api
-      #
-      def get(path, params)
-        github_request(path, params)
-      end
-
-      # Send a V3 API PUT request to path and parses the response body
-      #
-      # path - the path on api.github.com to hit
-      # params - extra params for calling the api
-      #
-      def post(path, params)
-        headers = {:Authorization => "token #{token}", :content_type => :json, :accept => :json}
-        res = RestClient.post("#{github_api_uri}/#{path}", params.to_json, headers)
-        Yajl.load(res)
-      end
-
-      # Send a V3 API PUT request to path and parses the response body
-      #
-      # path - the path on api.github.com to hit
-      # params - extra params for calling the api
-      #
-      def put(path, params)
-        headers = {:Authorization => "token #{token}", :content_type => :json, :accept => :json}
-        res = RestClient.put("#{github_api_uri}/#{path}", params.to_json, headers)
-        Yajl.load(res)
-      end
-
-      # Send a V3 API DELETE request to path and parses the response body
-      #
-      # path - the path on api.github.com to hit
-      # params - extra params for calling the api
-      #
-      def delete(path, params)
-        headers = {:Authorization => "token #{token}", :content_type => :json, :accept => :json}
-        res = RestClient.delete("#{github_api_uri}/#{path}", params.to_json, headers)
-        Yajl.load(res)
       end
 
       # Access the GitHub API from Octokit
@@ -108,49 +78,6 @@ module Warden
       # Returns a cached client object for easy use
       def api
         @api ||= Octokit::Client.new(:login => login, :oauth_token => token)
-      end
-
-      # Send a V3 API GET request to path and parse the response body
-      #
-      # path - the path on api.github.com to hit
-      # params - extra params for calling the api
-      #
-      # Returns a parsed JSON response
-      #
-      # Examples
-      #   github_request("/user")
-      #   # => { 'login' => 'atmos', ... }
-      #
-      #   github_request("/user/repos", {:page => 2})
-      #   # => [ { 'name' => 'gollum' ... } ]
-      def github_request(path, params = {})
-        Yajl.load(github_raw_request(path, params))
-      end
-
-      # Send a V3 API GET request to path
-      #
-      # path - the path on api.github.com to hit
-      #
-      # Returns a rest client response object
-      #
-      # Examples
-      #   github_raw_request("/user")
-      #   # => RestClient::Response
-      #
-      #   github_raw_request("/user/repos", {:page => 3})
-      #   # => RestClient::Response
-      def github_raw_request(path, params = {})
-        headers = {:Authorization => "token #{token}", :accept => :json}
-        RestClient.get("#{github_api_uri}/#{path}", headers.merge(:params => params))
-      end
-
-      private
-      def github_api_uri
-        if ENV['OCTOKIT_API_ENDPOINT']
-          ENV['OCTOKIT_API_ENDPOINT']
-        else
-          "https://api.github.com"
-        end
       end
     end
   end

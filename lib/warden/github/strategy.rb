@@ -79,9 +79,7 @@ module Warden
       end
 
       def load_user
-        user_info = Yajl.load(user_info_for(oauth.access_token))
-        user_info.delete('bio') # Delete bio, as it can easily make the session cookie too long.
-        User.new(user_info, oauth.access_token)
+        User.load(oauth.access_token)
       rescue OAuth::BadVerificationCode => e
         abort_flow!(e.message)
       end
@@ -100,12 +98,6 @@ module Warden
           :client_secret => env['warden'].config[:github_secret],
           :scope => env['warden'].config[:github_scopes],
           :redirect_uri => redirect_uri)
-      end
-
-      def user_info_for(token)
-        @user_info ||= RestClient.get(
-          Octokit::Configuration::DEFAULT_API_ENDPOINT + "user",
-          :params => {:access_token => token})
       end
 
       def redirect_uri
