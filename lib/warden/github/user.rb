@@ -3,30 +3,17 @@ require 'octokit'
 module Warden
   module GitHub
     class User < Struct.new(:attribs, :token)
+      ATTRIBUTES = %w[login name gravatar_id email company].freeze
+
       def self.load(access_token)
         api = Octokit::Client.new(:oauth_token => access_token)
+        data = api.user.to_hash.select { |k,_| ATTRIBUTES.include?(k) }
 
-        new(api.user.to_hash, access_token)
+        new(data, access_token)
       end
 
-      def login
-        attribs['login']
-      end
-
-      def name
-        attribs['name']
-      end
-
-      def gravatar_id
-        attribs['gravatar_id']
-      end
-
-      def email
-        attribs['email']
-      end
-
-      def company
-        attribs['company']
+      ATTRIBUTES.each do |name|
+        define_method(name) { attribs[name] }
       end
 
       # See if the user is a public member of the named organization
