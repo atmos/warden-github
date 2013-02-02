@@ -4,6 +4,7 @@ require 'rack/test'
 require 'webrat'
 require 'addressable/uri'
 require 'pp'
+require 'webmock/rspec'
 
 Webrat.configure do |config|
   config.mode = :rack
