@@ -14,7 +14,6 @@ module Example
       manager[:github_secret]       = ENV['GITHUB_CLIENT_SECRET'] || 'ed8ff0c54067aefb808dab1ca265865405d08d6f'
 
       manager[:github_scopes]       = ''
-      manager[:github_oauth_domain] = ENV['GITHUB_OAUTH_DOMAIN'] || 'https://github.com'
     end
 
     helpers do
