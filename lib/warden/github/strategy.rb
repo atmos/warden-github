@@ -85,7 +85,7 @@ module Warden
       def state
         @state ||=
           custom_session['state'] ||
-          Digest::SHA1.hexdigest(rand(36**8).to_s(36))
+          Digest::SHA1.hexdigest(OpenSSL::Random.random_bytes 20)
       end
 
       def oauth

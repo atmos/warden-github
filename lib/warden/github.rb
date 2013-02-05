@@ -7,3 +7,4 @@ require 'warden/github/strategy'
 require 'warden/github/hook'
 
 require 'yajl'
+require 'openssl'
