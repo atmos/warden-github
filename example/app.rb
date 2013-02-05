@@ -1,4 +1,5 @@
 require 'sinatra'
+require 'json'
 
 module Example
   class App < Sinatra::Base
@@ -58,7 +59,7 @@ module Example
       </ul>
       <h3>Profile</h3>
       <h4>Rails Org Member: #{user.organization_member?('rails')}.</h4>
-      <h4>Publicized Rails Org Member: #{user.publicized_organization_member?('rails')}.</h4>
+      <h4>Publicized Rails Org Member: #{user.organization_public_member?('rails')}.</h4>
       <h4>Rails Committer Team Member: #{user.team_member?(632)}.</h4>
       EOS
     end
