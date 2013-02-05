@@ -50,9 +50,6 @@ describe 'OAuth' do
 
     context 'and the returned state does not match the initial state' do
       it 'fails authentication' do
-        stub_code_for_token_exchange
-        stub_user_retrieval
-
         get '/login'
         response = get "/login?code=#{code}&state=foobar"
 
@@ -72,6 +69,18 @@ describe 'OAuth' do
 
         response.should_not be_successful
         response.body.should include 'Bad verification code'
+      end
+    end
+
+    context 'and the user denied access' do
+      it 'fails authentication' do
+        unauthenticated_response = get '/login'
+        github_uri = redirect_uri(unauthenticated_response)
+        state = github_uri.query_values['state']
+        response = get "/login?error=access_denied&state=#{state}"
+
+        response.should_not be_successful
+        response.body.should include 'access denied'
       end
     end
 
