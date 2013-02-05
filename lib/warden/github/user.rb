@@ -51,11 +51,14 @@ module Warden
       #
       # Returns: true if the user has access, false otherwise
       def team_member?(team_id)
+        # TODO: Use next line as method body once pengwynn/octokit#206 is public.
+        # api.team_member?(team_id, login)
+
         # If the user is able to query the team member
         # A user is only able to query for team members if they're a member.
         # Thus, if querying does succeed, they will be in the list and checking
         # the list won't be necessary.
-        api.team_member?(team_id, login)
+        api.team_members(team_id)
         true
       rescue Octokit::NotFound
         false
