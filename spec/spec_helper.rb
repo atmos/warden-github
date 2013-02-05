@@ -1,3 +1,9 @@
+require 'simplecov'
+SimpleCov.start do
+  add_filter '/spec'
+  add_filter '/example'
+end
+
 require 'warden/github'
 require File.expand_path('../../example/app', __FILE__)
 require 'rack/test'
