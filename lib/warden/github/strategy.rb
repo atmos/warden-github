@@ -14,8 +14,8 @@ module Warden
       # notified about the failure.
       #
       # Once the user gets set, warden invokes the after_authentication callback
-      # that handles the redirect to the originally requested url and the cleans
-      # up the flow. Note that this is done in a hook because setting a user
+      # that handles the redirect to the originally requested url and cleans up
+      # the flow. Note that this is done in a hook because setting a user
       # (through #success!) and redirecting (through #redirect!) inside the
       # #authenticate! method are mutual exclusive.
       def authenticate!
@@ -36,6 +36,11 @@ module Warden
 
       private
 
+      def setup_flow
+        custom_session['state'] = state
+        custom_session['return_to'] = request.url
+      end
+
       def begin_flow!
         setup_flow
         redirect!(oauth.authorize_uri.to_s)
@@ -53,11 +58,6 @@ module Warden
         throw(:warden)
       end
 
-      def setup_flow
-        custom_session['state'] = state
-        custom_session['return_to'] = request.url
-      end
-
       def teardown_flow
         session.delete(SESSION_KEY)
       end
@@ -67,7 +67,7 @@ module Warden
       end
 
       def validate_flow!
-        abort_flow!('State mismatch')  unless valid_state?
+        abort_flow!('State mismatch') unless valid_state?
       end
 
       def valid_state?
@@ -92,12 +92,12 @@ module Warden
 
       def oauth
         @oauth ||= OAuth.new(
-          :code => params['code'],
-          :state => state,
-          :client_id => env['warden'].config[:github_client_id],
+          :code          => params['code'],
+          :state         => state,
+          :scope         => env['warden'].config[:github_scopes],
+          :client_id     => env['warden'].config[:github_client_id],
           :client_secret => env['warden'].config[:github_secret],
-          :scope => env['warden'].config[:github_scopes],
-          :redirect_uri => redirect_uri)
+          :redirect_uri  => redirect_uri)
       end
 
       def redirect_uri
