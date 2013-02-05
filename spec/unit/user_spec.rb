@@ -58,7 +58,7 @@ describe Warden::GitHub::User do
   describe '#team_member?' do
     it 'asks the api for team members' do
       status = double
-      stub_api(user, :team_member?, [123, 'john'], false)
+      stub_api(user, :team_member?, [123, user.login], false)
 
       user.team_member?(123)
     end
@@ -68,8 +68,7 @@ describe Warden::GitHub::User do
         api = double
         user.stub(:api => api)
 
-        # Second argument needed, see pengwynn/octokit#213.
-        api.stub(:team_member?, [123, 'john']).and_raise(Octokit::NotFound.new({}))
+        api.stub(:team_member?, [123, user.login]).and_raise(Octokit::NotFound.new({}))
 
         user.should_not be_team_member(123)
       end
@@ -79,7 +78,7 @@ describe Warden::GitHub::User do
       it 'returns true' do
         api = double
         user.stub(:api => api)
-        api.stub(:team_member?, [123, 'john'])
+        api.stub(:team_member?, [123, user.login])
 
         user.should be_team_member(123)
       end
