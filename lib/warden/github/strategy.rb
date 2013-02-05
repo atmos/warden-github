@@ -26,6 +26,10 @@ module Warden
         end
       end
 
+      def in_flow?
+        !custom_session.empty? && params['state'] && params['code']
+      end
+
       # This is called by the after_authentication hook which is invoked after
       # invoking #success!.
       def finalize_flow!
@@ -36,13 +40,9 @@ module Warden
 
       private
 
-      def setup_flow
+      def begin_flow!
         custom_session['state'] = state
         custom_session['return_to'] = request.url
-      end
-
-      def begin_flow!
-        setup_flow
         redirect!(oauth.authorize_uri.to_s)
         throw(:warden)
       end
@@ -60,10 +60,6 @@ module Warden
 
       def teardown_flow
         session.delete(SESSION_KEY)
-      end
-
-      def in_flow?
-        !custom_session.empty? && params['state'] && params['code']
       end
 
       def validate_flow!
