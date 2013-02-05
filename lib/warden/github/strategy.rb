@@ -83,8 +83,7 @@ module Warden
       end
 
       def state
-        @state ||=
-          custom_session['state'] || SecureRandom.hex(20)
+        @state ||= custom_session['state'] || SecureRandom.hex(20)
       end
 
       def oauth
