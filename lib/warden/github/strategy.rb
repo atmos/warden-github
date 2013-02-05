@@ -27,7 +27,9 @@ module Warden
       end
 
       def in_flow?
-        !custom_session.empty? && params['state'] && params['code']
+        !custom_session.empty? &&
+          params['state'] &&
+          (params['code'] || params['error'])
       end
 
       # This is called by the after_authentication hook which is invoked after
@@ -63,11 +65,11 @@ module Warden
       end
 
       def validate_flow!
-        abort_flow!('State mismatch') unless valid_state?
-      end
-
-      def valid_state?
-        params['state'] == state
+        if params['state'] != state
+          abort_flow!('State mismatch')
+        elsif (error = params['error']) && !error.blank?
+          abort_flow!(error.gsub(/_/, ' '))
+        end
       end
 
       def custom_session
