@@ -3,7 +3,7 @@ require 'octokit'
 module Warden
   module GitHub
     class User < Struct.new(:attribs, :token)
-      ATTRIBUTES = %w[login name gravatar_id email company].freeze
+      ATTRIBUTES = %w[id login name gravatar_id email company].freeze
 
       def self.load(access_token)
         api = Octokit::Client.new(:oauth_token => access_token)
@@ -51,15 +51,11 @@ module Warden
       #
       # Returns: true if the user has access, false otherwise
       def team_member?(team_id)
-        # TODO: Use next line as method body once pengwynn/octokit#206 is public.
-        # api.team_member?(team_id, login)
-
         # If the user is able to query the team member
         # A user is only able to query for team members if they're a member.
         # Thus, if querying does succeed, they will be in the list and checking
         # the list won't be necessary.
-        api.team_members(team_id)
-
+        api.team_member?(team_id, login)
         true
       rescue Octokit::NotFound
         false

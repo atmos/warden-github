@@ -14,7 +14,8 @@ Gem::Specification.new do |s|
   s.rubyforge_project = "warden-github"
 
   s.add_dependency "warden", "~>1.0"
-  s.add_dependency "octokit", ">1.20.0"
+  s.add_dependency "octokit", ">=1.22.0"
+  s.add_dependency "yajl-ruby", ">=1.1.0"
 
   s.add_development_dependency "rack",      "~>1.4.1"
   s.add_development_dependency "rake"
@@ -26,7 +27,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency "shotgun"
   s.add_development_dependency "addressable", "~>2.2.0"
   s.add_development_dependency "rack-test",   "~>0.5.3"
-  s.add_development_dependency "json"
 
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")

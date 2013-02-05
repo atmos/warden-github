@@ -1,5 +1,5 @@
 require 'sinatra'
-require 'json'
+require 'yajl/json_gem'
 
 module Example
   class App < Sinatra::Base
