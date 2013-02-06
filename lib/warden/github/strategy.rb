@@ -67,7 +67,7 @@ module Warden
       def validate_flow!
         if params['state'] != state
           abort_flow!('State mismatch')
-        elsif (error = params['error']) && !error.blank?
+        elsif (error = params['error']) && !error.empty?
           abort_flow!(error.gsub(/_/, ' '))
         end
       end
