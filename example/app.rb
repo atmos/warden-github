@@ -7,14 +7,17 @@ module Example
     enable  :raise_errors
     disable :show_exceptions
 
-    use Warden::Manager do |manager|
-      manager.default_strategies :github
-      manager.failure_app = BadAuthentication
 
-      manager[:github_client_id]    = ENV['GITHUB_CLIENT_ID']     || 'ee9aa24b64d82c21535a'
-      manager[:github_secret]       = ENV['GITHUB_CLIENT_SECRET'] || 'ed8ff0c54067aefb808dab1ca265865405d08d6f'
+    GITHUB_CONFIG = {
+      :client_id     => ENV['GITHUB_CLIENT_ID']     || 'test_client_id',
+      :client_secret => ENV['GITHUB_CLIENT_SECRET'] || 'test_client_secret',
+      :scope         => 'user'
+    }
 
-      manager[:github_scopes]       = ''
+    use Warden::Manager do |config|
+      config.failure_app = BadAuthentication
+      config.default_strategies :github
+      config.scope_defaults :default, :config => GITHUB_CONFIG
     end
 
     helpers do
