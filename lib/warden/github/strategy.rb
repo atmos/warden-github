@@ -88,32 +88,11 @@ module Warden
 
       def oauth
         @oauth ||= OAuth.new(
-          :code          => params['code'],
-          :state         => state,
-          :scope         => env['warden'].config[:github_scopes],
-          :client_id     => env['warden'].config[:github_client_id],
-          :client_secret => env['warden'].config[:github_secret],
-          :redirect_uri  => redirect_uri)
+          config.to_hash.merge(:code => params['code'], :state => state))
       end
 
-      def redirect_uri
-        absolute_uri(request, callback_path, env['HTTP_X_FORWARDED_PROTO'])
-      end
-
-      def callback_path
-        env['warden'].config[:github_callback_url] || request.path
-      end
-
-      def absolute_uri(request, suffix = nil, proto = "http")
-        port_part = case request.scheme
-                    when "http"
-                      request.port == 80 ? "" : ":#{request.port}"
-                    when "https"
-                      request.port == 443 ? "" : ":#{request.port}"
-                    end
-
-        proto = "http" if proto.nil?
-        "#{proto}://#{request.host}#{port_part}#{suffix}"
+      def config
+        @config ||= ::Warden::GitHub::Config.new(env, scope)
       end
     end
   end
