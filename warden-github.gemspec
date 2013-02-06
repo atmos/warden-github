@@ -15,7 +15,6 @@ Gem::Specification.new do |s|
 
   s.add_dependency "warden",    ">1.0"
   s.add_dependency "octokit",   ">=1.22.0"
-  s.add_dependency "yajl-ruby", ">=1.1.0"
 
   s.add_development_dependency "rack",      "~>1.4.1"
   s.add_development_dependency "rake"
