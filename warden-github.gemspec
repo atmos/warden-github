@@ -26,6 +26,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency "shotgun"
   s.add_development_dependency "addressable", "~>2.2.0"
   s.add_development_dependency "rack-test",   "~>0.5.3"
+  s.add_development_dependency "yajl-ruby"
 
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
