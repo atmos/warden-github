@@ -30,7 +30,9 @@ module Warden
       #
       # Returns: true if the user is publicized as an org member
       def organization_public_member?(org_name)
-        api.organization_public_member?(org_name, login)
+        fetch_membership(:org_pub, org_name) do
+          api.organization_public_member?(org_name, login)
+        end
       end
 
       # Backwards compatibility:
@@ -42,7 +44,9 @@ module Warden
       #
       # Returns: true if the user has access, false otherwise
       def organization_member?(org_name)
-        api.organization_member?(org_name, login)
+        fetch_membership(:org, org_name) do
+          api.organization_member?(org_name, login)
+        end
       end
 
       # See if the user is a member of the team id
@@ -51,17 +55,20 @@ module Warden
       #
       # Returns: true if the user has access, false otherwise
       def team_member?(team_id)
-        # TODO: Use next line as method body once pengwynn/octokit#206 is public.
-        # api.team_member?(team_id, login)
+        fetch_membership(:team, team_id) do
+          # TODO: Use next line as method body once pengwynn/octokit#206 is public.
+          # api.team_member?(team_id, login)
 
-        # If the user is able to query the team member
-        # A user is only able to query for team members if they're a member.
-        # Thus, if querying does succeed, they will be in the list and checking
-        # the list won't be necessary.
-        api.team_members(team_id)
-        true
-      rescue Octokit::NotFound
-        false
+          begin
+            # A user is only able to query for team members if they're a member.
+            # Thus, if querying does succeed, they will be in the list and
+            # checking the list won't be necessary.
+            api.team_members(team_id)
+            true
+          rescue Octokit::NotFound
+            false
+          end
+        end
       end
 
       # Access the GitHub API from Octokit
@@ -75,6 +82,23 @@ module Warden
         # in MRI 1.9.3 (Bug #7627) that causes instance variables to be
         # marshaled even when explicitly specifying #marshal_dump.
         Octokit::Client.new(:login => login, :oauth_token => token)
+      end
+
+      private
+
+      # Fetches a membership status by type (e.g. 'org') and id (e.g. 'github')
+      # from cache. If no value is present, the block will be invoked and the
+      # return value cached for subsequent calls.
+      def fetch_membership(type, id)
+        id = id.to_s if id.is_a?(Symbol)
+        attribs['member'] ||= {}
+        hash = attribs['member'][type.to_s] ||= {}
+
+        if hash.include?(id)
+          hash[id]
+        else
+          hash[id] = yield
+        end
       end
     end
   end
