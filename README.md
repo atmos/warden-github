@@ -1,18 +1,25 @@
 # warden-github
 
-A [warden](/hassox/warden) strategy that provides oauth authentication to github.  Find out more about enabling your application at github's [oauth quickstart](http://gist.github.com/419219).
-
-To test it out on localhost set your callback url to 'http://localhost:9292/'.
-
-There's an example app in [example/app.rb](/atmos/warden-github/blob/master/example/app.rb).
-
-## Using with GitHub Enterprise
-
-Export the `OCTOKIT_API_ENDPOINT` environmental variable to the URL of your enterprise install.
+A [warden](https://github.com/hassox/warden) strategy that provides oauth authentication to github.  Find out more about enabling your application at github's [oauth quickstart](http://gist.github.com/419219).
 
 ## The Extension in Action
 
-    % GITHUB_CLIENT_ID="<from GH>" GITHUB_CLIENT_SECRET="<from GH>" bundle exec rackup
+To play with the extension, follow these steps:
+
+1.  [Create an application on GitHub](https://github.com/settings/applications/new) and set the callback URL to `http://localhost:9292`
+2.  Run the following command with the client id and client secret obtained from the previous step:
+
+        % GITHUB_CLIENT_ID="<from GH>" GITHUB_CLIENT_SECRET="<from GH>" bundle exec rackup
+
+    This will run the example app [example/simple_app.rb](example/simple_app.rb).
+
+    If you wish to see multiple user scopes in action, run the above command with an additional variable:
+
+        % MULTI_SCOPE_APP=1 GITHUB_CLIENT_ID="<from GH>" GITHUB_CLIENT_SECRET="<from GH>" bundle exec rackup
+
+    This will run the example app [example/multi_scope_app.rb](example/multi_scope_app.rb).
+
+3.  Point your browser at [http://localhost:9292/](http://localhost:9292) and enjoy!
 
 ## Configuration
 
@@ -73,3 +80,7 @@ Please refer to the [GitHub OAuth documentation](http://developer.github.com/v3/
 - **scope:** Defaults to `nil`.
 - **redirect_uri:** Defaults to the current path.
   Note that paths will be expanded to a valid URL using the request url's host.
+
+## Using with GitHub Enterprise
+
+Export the `OCTOKIT_API_ENDPOINT` environmental variable to the URL of your enterprise install.
