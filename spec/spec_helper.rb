@@ -5,7 +5,7 @@ SimpleCov.start do
 end
 
 require 'warden/github'
-require File.expand_path('../../example/app', __FILE__)
+require File.expand_path('../../example/simple_app', __FILE__)
 require 'rack/test'
 require 'webrat'
 require 'addressable/uri'
@@ -21,9 +21,6 @@ RSpec.configure do |config|
   config.include(Rack::Test::Methods)
   config.include(Webrat::Methods)
   config.include(Webrat::Matchers)
-
-  config.before(:each) do
-  end
 
   def app
     Example.app
