@@ -21,7 +21,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency "rspec",     "~>2.8"
   s.add_development_dependency "simplecov"
   s.add_development_dependency "webmock",   "~>1.9"
-  s.add_development_dependency "webrat"
   s.add_development_dependency "sinatra"
   s.add_development_dependency "shotgun"
   s.add_development_dependency "addressable", "~>2.2.0"
