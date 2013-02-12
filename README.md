@@ -1,25 +1,26 @@
 # warden-github
 
-A [warden](https://github.com/hassox/warden) strategy that provides oauth authentication to github.  Find out more about enabling your application at github's [oauth quickstart](http://gist.github.com/419219).
+A [warden](https://github.com/hassox/warden) strategy that provides OAuth authentication to GitHub.
 
 ## The Extension in Action
 
 To play with the extension, follow these steps:
 
-1.  [Create an application on GitHub](https://github.com/settings/applications/new) and set the callback URL to `http://localhost:9292`
-2.  Run the following command with the client id and client secret obtained from the previous step:
+1.  Check out a copy of the source.
+2.  [Create an application on GitHub](https://github.com/settings/applications/new) and set the callback URL to `http://localhost:9292`
+3.  Run the following command with the client id and client secret obtained from the previous step:
 
-        % GITHUB_CLIENT_ID="<from GH>" GITHUB_CLIENT_SECRET="<from GH>" bundle exec rackup
+        GITHUB_CLIENT_ID="<from GH>" GITHUB_CLIENT_SECRET="<from GH>" bundle exec rackup
 
     This will run the example app [example/simple_app.rb](example/simple_app.rb).
 
     If you wish to see multiple user scopes in action, run the above command with an additional variable:
 
-        % MULTI_SCOPE_APP=1 GITHUB_CLIENT_ID="<from GH>" GITHUB_CLIENT_SECRET="<from GH>" bundle exec rackup
+        MULTI_SCOPE_APP=1 GITHUB_CLIENT_ID="<from GH>" GITHUB_CLIENT_SECRET="<from GH>" bundle exec rackup
 
     This will run the example app [example/multi_scope_app.rb](example/multi_scope_app.rb).
 
-3.  Point your browser at [http://localhost:9292/](http://localhost:9292) and enjoy!
+4.  Point your browser at [http://localhost:9292/](http://localhost:9292) and enjoy!
 
 ## Configuration
 
@@ -40,6 +41,7 @@ In order to pass custom configurations, you need to configure a warden scope.
 Note that the default warden scope (i.e. when not specifying any explicit scope) is `:default`.
 
 Here's an example that specifies configs for the default scope and a custom admin scope.
+Using multiple scopes allows you to have different user types.
 
 ```ruby
 use Warden::Manager do |config|
@@ -54,22 +56,6 @@ use Warden::Manager do |config|
 end
 ```
 
-### Multiple Scopes Usage
-
-Using multiple scopes allows you to have different user types:
-
-```ruby
-env['warden'].authenticate                  # => Uses the configs from the default scope.
-env['warden'].authenticate :scope => :admin # => Uses the configs from the admin scope.
-
-env['warden'].user         # => The user for the default scope.
-env['warden'].user(:admin) # => The user for the admin scope.
-
-env['warden'].logout           # => Logs out all scopes.
-env['warden'].logout(:default) # => Logs out the default scope.
-env['warden'].logout(:admin)   # => Logs out the default scope.
-```
-
 ### Parameters
 
 The config parameters and their defaults are listed below.
@@ -81,6 +67,75 @@ Please refer to the [GitHub OAuth documentation](http://developer.github.com/v3/
 - **redirect_uri:** Defaults to the current path.
   Note that paths will be expanded to a valid URL using the request url's host.
 
-## Using with GitHub Enterprise
+### Using with GitHub Enterprise
 
-Export the `OCTOKIT_API_ENDPOINT` environmental variable to the URL of your enterprise install.
+GitHub API communication is done entirely through the [octokit gem](https://github.com/pengwynn/octokit).
+For the OAuth process (which uses another endpoint than the API), the web endpoint is read from octokit.
+In order to configure octokit for GitHub Enterprise you can either define the two environment variables `OCTOKIT_API_ENDPOINT` and `OCTOKIT_WEB_ENDPOINT`, or configure the `Octokit` module as specified in their [README](https://github.com/pengwynn/octokit#using-with-github-enterprise).
+
+### JSON Dependency
+
+This gem and its dependencies do not explicitly depend on any JSON library.
+If you're on ruby 1.8.7 you'll have to include one explicitly.
+ruby 1.9 comes with a json library that will be used if no other is specified.
+
+## Usage
+
+Some warden methods that you will need:
+
+```ruby
+env['warden'].authenticate!                   # => Uses the configs from the default scope.
+env['warden'].authenticate!(:scope => :admin) # => Uses the configs from the admin scope.
+
+# Analogous to previous lines, but does not halt if authentication does not succeed.
+env['warden'].authenticate
+env['warden'].authenticate(:scope => :admin)
+
+env['warden'].authenticated?         # => Checks whether the default scope is logged in.
+env['warden'].authenticated?(:admin) # => Checks whether the admin scope is logged in.
+
+env['warden'].user         # => The user for the default scope.
+env['warden'].user(:admin) # => The user for the admin scope.
+
+env['warden'].session         # => Namespaced session accessor for the default scope.
+env['warden'].session(:admin) # => Namespaced session accessor for the admin scope.
+
+env['warden'].logout           # => Logs out all scopes.
+env['warden'].logout(:default) # => Logs out the default scope.
+env['warden'].logout(:admin)   # => Logs out the admin scope.
+```
+
+For further documentation, refer to the [warden wiki](https://github.com/hassox/warden/wiki).
+
+The user object (`Warden::GitHub::User`) responds to the following methods:
+
+```ruby
+user = env['warden'].user
+
+user.id          # => The GitHub user id.
+user.login       # => The GitHub username.
+user.name
+user.gravatar_id # => The md5 email hash to construct a gravatar image.
+user.email       # => Requires user:email or user scope.
+user.company
+
+# These require user scope.
+user.organization_member?('rails')         # => Checks 'rails' organization membership.
+user.organization_public_member?('github') # => Checks publicly disclosed 'github' organization membership.
+user.team_member?(1234)                    # => Checks membership in team with id 1234.
+
+# API access
+user.api # => Authenticated Octokit::Client for the user.
+```
+
+For more information on API access, refer to the [octokit documentation](http://rdoc.info/gems/octokit).
+
+## Additional Information
+
+- [warden](https://github.com/hassox/warden)
+- [octokit](https://github.com/pengwynn/octokit)
+- [GitHub OAuth Busy Developer's Guide](https://gist.github.com/technoweenie/419219)
+- [GitHub API documentation](http://developer.github.com)
+- [List of GitHub OAuth scopes](http://developer.github.com/v3/oauth/#scopes)
+- [Register a new OAuth application on GitHub](https://github.com/settings/applications/new)
+
