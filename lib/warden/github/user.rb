@@ -30,7 +30,7 @@ module Warden
       #
       # Returns: true if the user is publicized as an org member
       def organization_public_member?(org_name)
-        fetch_membership(:org_pub, org_name) do
+        memberships.fetch_membership(:org_pub, org_name) do
           api.organization_public_member?(org_name, login)
         end
       end
@@ -44,7 +44,7 @@ module Warden
       #
       # Returns: true if the user has access, false otherwise
       def organization_member?(org_name)
-        fetch_membership(:org, org_name) do
+        memberships.fetch_membership(:org, org_name) do
           api.organization_member?(org_name, login)
         end
       end
@@ -55,7 +55,7 @@ module Warden
       #
       # Returns: true if the user has access, false otherwise
       def team_member?(team_id)
-        fetch_membership(:team, team_id) do
+        memberships.fetch_membership(:team, team_id) do
           # TODO: Use next line as method body once pengwynn/octokit#206 is public.
           # api.team_member?(team_id, login)
 
@@ -86,19 +86,8 @@ module Warden
 
       private
 
-      # Fetches a membership status by type (e.g. 'org') and id (e.g. 'github')
-      # from cache. If no value is present, the block will be invoked and the
-      # return value cached for subsequent calls.
-      def fetch_membership(type, id)
-        id = id.to_s if id.is_a?(Symbol)
-        attribs['member'] ||= {}
-        hash = attribs['member'][type.to_s] ||= {}
-
-        if hash.include?(id)
-          hash[id]
-        else
-          hash[id] = yield
-        end
+      def memberships
+        attribs['member'] ||= MembershipCache.new
       end
     end
   end
