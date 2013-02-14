@@ -46,23 +46,23 @@ describe Warden::GitHub::User do
 
   [:organization_public_member?, :organization_member?].each do |method|
     describe "##{method}" do
-      it 'asks the api for the member status' do
-        status = double
-        stub_api(user, method, ['rails', user.login], status)
+      context 'when user is not member' do
+        it 'returns false' do
+          stub_api(user, method, ['rails', user.login], false)
+          user.send(method, 'rails').should be_false
+        end
+      end
 
-        user.send(method, 'rails').should be status
+      context 'when user is member' do
+        it 'returns true' do
+          stub_api(user, method, ['rails', user.login], true)
+          user.send(method, 'rails').should be_true
+        end
       end
     end
   end
 
   describe '#team_member?' do
-    it 'asks the api for team members' do
-      status = double
-      stub_api(user, :team_members, [123], false)
-
-      user.team_member?(123)
-    end
-
     context 'when user is not member' do
       it 'returns false' do
         api = double
