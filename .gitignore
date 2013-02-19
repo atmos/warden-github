@@ -8,3 +8,4 @@ vendor/gems
 .rbenv-version
 bin/
 tags
+.ruby-version
