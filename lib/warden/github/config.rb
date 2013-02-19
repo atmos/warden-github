@@ -133,6 +133,7 @@ module Warden
 
       def correct_scheme(uri)
         if uri.scheme != 'https' && env['HTTP_X_FORWARDED_PROTO'] == 'https'
+          uri.port   = nil if uri.port == 80
           uri.scheme = 'https'
           # Reparsing will use a different URI subclass, namely URI::HTTPS which
           # knows the default port for https and strips it if present.
