@@ -130,6 +130,13 @@ user.api # => Authenticated Octokit::Client for the user.
 
 For more information on API access, refer to the [octokit documentation](http://rdoc.info/gems/octokit).
 
+## Framework Adapters
+
+If you're looking for an easy way to integrate this into a Sinatra or Rails application, take a look at the following gems:
+
+- [sinatra_auth_github](https://github.com/atmos/sinatra_auth_github)
+- [warden-github-rails](https://github.com/fphilipe/warden-github-rails)
+
 ## Additional Information
 
 - [warden](https://github.com/hassox/warden)
