@@ -3,7 +3,7 @@ require 'octokit'
 module Warden
   module GitHub
     class User < Struct.new(:attribs, :token)
-      ATTRIBUTES = %w[id login name gravatar_id email company].freeze
+      ATTRIBUTES = %w[id login name gravatar_id email company site_admin].freeze
 
       def self.load(access_token)
         api = Octokit::Client.new(:oauth_token => access_token)
@@ -69,6 +69,13 @@ module Warden
             false
           end
         end
+      end
+
+      # Identify GitHub employees/staff members.
+      #
+      # Returns: true if the authenticated user is a GitHub employee, false otherwise
+      def site_admin?
+        site_admin || false
       end
 
       # Access the GitHub API from Octokit

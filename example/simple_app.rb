@@ -82,4 +82,6 @@ __END__
   <dd><%= env['warden'].user.organization_public_member?('rails') %></dd>
   <dt>Rails Committer Team Member:</dt>
   <dd><%= env['warden'].user.team_member?(632) %></dd>
+  <dt>GitHub Site Admin:</dt>
+  <dd><%= env['warden'].user.site_admin? %></dd>
 </dl>
