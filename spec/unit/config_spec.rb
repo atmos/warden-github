@@ -4,7 +4,7 @@ describe Warden::GitHub::Config do
   let(:warden_scope) { :test_scope }
 
   let(:env) do
-    { 'warden' => stub(:config => warden_config) }
+    { 'warden' => double(:config => warden_config) }
   end
 
   let(:warden_config) do
@@ -16,7 +16,7 @@ describe Warden::GitHub::Config do
   end
 
   let(:request) do
-    stub(:url => 'http://example.com/the/path', :path => '/the/path')
+    double(:url => 'http://example.com/the/path', :path => '/the/path')
   end
 
   subject(:config) do
