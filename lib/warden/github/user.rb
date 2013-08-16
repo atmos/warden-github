@@ -55,20 +55,7 @@ module Warden
       #
       # Returns: true if the user has access, false otherwise
       def team_member?(team_id)
-        memberships.fetch_membership(:team, team_id) do
-          # TODO: Use next line as method body once pengwynn/octokit#206 is public.
-          # api.team_member?(team_id, login)
-
-          begin
-            # A user is only able to query for team members if they're a member.
-            # Thus, if querying does succeed, they will be in the list and
-            # checking the list won't be necessary.
-            api.team_members(team_id)
-            true
-          rescue Octokit::NotFound
-            false
-          end
-        end
+        api.team_member?(team_id, login)
       end
 
       # Identify GitHub employees/staff members.
@@ -81,7 +68,7 @@ module Warden
       # Access the GitHub API from Octokit
       #
       # Octokit is a robust client library for the GitHub API
-      # https://github.com/pengwynn/octokit
+      # https://github.com/octokit/octokit.rb
       #
       # Returns a cached client object for easy use
       def api
