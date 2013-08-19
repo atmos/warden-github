@@ -65,11 +65,10 @@ describe Warden::GitHub::User do
   describe '#team_member?' do
     context 'when user is not member' do
       it 'returns false' do
-        api = double
+        api = double()
         user.stub(:api => api)
 
-        # api.stub(:team_member?, [123, user.login]).and_raise(Octokit::NotFound.new({}))
-        api.stub(:team_members, [123]).and_raise(Octokit::NotFound.new({}))
+        api.stub(:team_member?).with(123, user.login).and_return(false)
 
         user.should_not be_team_member(123)
       end
@@ -77,10 +76,9 @@ describe Warden::GitHub::User do
 
     context 'when user is member' do
       it 'returns true' do
-        api = double
+        api = double()
         user.stub(:api => api)
-        # api.stub(:team_member?, [123, user.login])
-        api.stub(:team_members, [123])
+        api.stub(:team_member?).with(123, user.login).and_return(true)
 
         user.should be_team_member(123)
       end
