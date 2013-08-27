@@ -59,7 +59,7 @@ module Warden
       end
 
       def build_uri(path, params)
-        URI(Octokit::web_endpoint).tap do |uri|
+        URI(Octokit.web_endpoint).tap do |uri|
           uri.path = path
           uri.query = encode_params(normalize_params(params))
         end
