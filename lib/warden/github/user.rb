@@ -6,8 +6,12 @@ module Warden
       ATTRIBUTES = %w[id login name gravatar_id email company site_admin].freeze
 
       def self.load(access_token)
-        api = Octokit::Client.new(:access_token => access_token)
-        data = Hash[api.user.to_hash.select { |k,_| ATTRIBUTES.include?(k) }]
+        api  = Octokit::Client.new(:access_token => access_token)
+        data =  { }
+
+        api.user.to_hash.each do |k,v|
+          data[k.to_s] = v if ATTRIBUTES.include?(k.to_s)
+        end
 
         new(data, access_token)
       end
@@ -62,7 +66,7 @@ module Warden
       #
       # Returns: true if the authenticated user is a GitHub employee, false otherwise
       def site_admin?
-        site_admin || false
+        !!site_admin
       end
 
       # Access the GitHub API from Octokit
@@ -75,7 +79,7 @@ module Warden
         # Don't cache instance for now because of a ruby marshaling bug present
         # in MRI 1.9.3 (Bug #7627) that causes instance variables to be
         # marshaled even when explicitly specifying #marshal_dump.
-        Octokit::Client.new(:access_token => token)
+        Octokit::Client.new(:login => login, :access_token => token)
       end
 
       private
