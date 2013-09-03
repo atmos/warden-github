@@ -15,7 +15,7 @@ describe Warden::GitHub::OAuth do
   describe '#authorize_uri' do
     it 'contains the base uri' do
       oauth.authorize_uri.to_s.should \
-        include Octokit::Configuration::DEFAULT_WEB_ENDPOINT
+        include Octokit.web_endpoint
     end
 
     %w[ client_id state redirect_uri ].each do |name|

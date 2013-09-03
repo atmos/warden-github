@@ -6,7 +6,7 @@ module Warden
       ATTRIBUTES = %w[id login name gravatar_id email company site_admin].freeze
 
       def self.load(access_token)
-        api = Octokit::Client.new(:oauth_token => access_token)
+        api = Octokit::Client.new(:access_token => access_token)
         data = Hash[api.user.to_hash.select { |k,_| ATTRIBUTES.include?(k) }]
 
         new(data, access_token)
@@ -75,7 +75,7 @@ module Warden
         # Don't cache instance for now because of a ruby marshaling bug present
         # in MRI 1.9.3 (Bug #7627) that causes instance variables to be
         # marshaled even when explicitly specifying #marshal_dump.
-        Octokit::Client.new(:login => login, :oauth_token => token)
+        Octokit::Client.new(:access_token => token)
       end
 
       private

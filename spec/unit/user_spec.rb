@@ -34,7 +34,7 @@ describe Warden::GitHub::User do
 
       api.should be_an Octokit::Client
       api.login.should eq user.login
-      api.oauth_token.should eq user.token
+      api.access_token.should eq user.token
     end
   end
 
@@ -92,7 +92,7 @@ describe Warden::GitHub::User do
 
       Octokit::Client.
         should_receive(:new).
-        with(:oauth_token => token).
+        with(:access_token => token).
         and_return(client)
       client.should_receive(:user).and_return(attrs)
 
