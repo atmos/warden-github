@@ -9,6 +9,7 @@ Gem::Specification.new do |s|
   s.email       = ["atmos@atmos.org"]
   s.homepage    = "http://github.com/atmos/warden-github"
   s.summary     = "A warden strategy for easy oauth integration with github"
+  s.license     = 'MIT'
   s.description = s.summary
 
   s.rubyforge_project = "warden-github"
