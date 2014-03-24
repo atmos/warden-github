@@ -131,8 +131,13 @@ module Warden
         end
       end
 
+      def x_forwarded_proto
+        env['HTTP_X_FORWARDED_PROTO'] &&
+          env['HTTP_X_FORWARDED_PROTO'].split(',')[0]
+      end
+
       def correct_scheme(uri)
-        if uri.scheme != 'https' && env['HTTP_X_FORWARDED_PROTO'] == 'https'
+        if uri.scheme != 'https' && x_forwarded_proto == 'https'
           uri.port   = nil if uri.port == 80
           uri.scheme = 'https'
           # Reparsing will use a different URI subclass, namely URI::HTTPS which
