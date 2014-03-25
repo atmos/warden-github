@@ -133,7 +133,7 @@ module Warden
 
       def https_forwarded_proto?
         env['HTTP_X_FORWARDED_PROTO'] &&
-          env['HTTP_X_FORWARDED_PROTO'].split(',').include?("https")
+          env['HTTP_X_FORWARDED_PROTO'].split(',')[0] == "https"
       end
 
       def correct_scheme(uri)
