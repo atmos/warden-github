@@ -141,6 +141,12 @@ describe Warden::GitHub::Config do
         config.redirect_uri.should eq 'https://example.com/the/path'
       end
 
+      it 'returns the expanded redirect uri with adjusted scheme including port 80 with multiple forwarded protocols' do
+        env['HTTP_X_FORWARDED_PROTO'] = 'https,https'
+        request.stub(:url => 'https://example.com:80/the/path')
+        config.redirect_uri.should eq 'https://example.com/the/path'
+      end
+
       it 'returns the expanded redirect uri(without port) with adjusted scheme' do
         env['HTTP_X_FORWARDED_PROTO'] = 'https'
         request.stub(:url => 'http://example.com/the/path')
