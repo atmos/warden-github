@@ -66,7 +66,7 @@ __END__
 @@ index
 <% if env['warden'].authenticated? %>
   <h2>
-    <img src='http://gravatar.com/avatar/<%= env['warden'].user.gravatar_id %>.png?r=PG&s=50' />
+    <img src='<%= env['warden'].user.avatar_url %>' width='50' height='50' />
     Welcome <%= env['warden'].user.name %>
   </h2>
 <% else %>

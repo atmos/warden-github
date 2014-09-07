@@ -5,6 +5,7 @@ describe Warden::GitHub::User do
     { 'login' => 'john',
       'name' => 'John Doe',
       'gravatar_id' => '38581cb351a52002548f40f8066cfecg',
+      'avatar_url' => 'http://example.com/avatar.jpg',
       'email' => 'john@doe.com',
       'company' => 'Doe, Inc.' }
   end
@@ -20,7 +21,7 @@ describe Warden::GitHub::User do
     end
   end
 
-  %w[login name gravatar_id email company].each do |name|
+  %w[login name gravatar_id avatar_url email company].each do |name|
     describe "##{name}" do
       it "returns the #{name}" do
         user.send(name).should eq default_attrs[name]
