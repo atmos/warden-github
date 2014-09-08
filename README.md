@@ -116,6 +116,7 @@ user.id          # => The GitHub user id.
 user.login       # => The GitHub username.
 user.name
 user.gravatar_id # => The md5 email hash to construct a gravatar image.
+user.avatar_url
 user.email       # => Requires user:email or user scope.
 user.company
 

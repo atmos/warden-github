@@ -3,7 +3,7 @@ require 'octokit'
 module Warden
   module GitHub
     class User < Struct.new(:attribs, :token)
-      ATTRIBUTES = %w[id login name gravatar_id email company site_admin].freeze
+      ATTRIBUTES = %w[id login name gravatar_id avatar_url email company site_admin].freeze
 
       def self.load(access_token)
         api  = Octokit::Client.new(:access_token => access_token)
