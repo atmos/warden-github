@@ -1,3 +1,7 @@
+v1.0.3 2014/12/13
+
+* Reintroduce membership caching to reduce API hits for validating team membership.
+
 v1.0.1 2014/03/24
 -----------------
 
