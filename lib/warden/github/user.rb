@@ -59,7 +59,9 @@ module Warden
       #
       # Returns: true if the user has access, false otherwise
       def team_member?(team_id)
-        api.team_member?(team_id, login)
+        memberships.fetch_membership(:team, team_id) do
+          api.team_member?(team_id, login)
+        end
       end
 
       # Identify GitHub employees/staff members.
