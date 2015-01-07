@@ -7,7 +7,7 @@ describe Warden::GitHub::MembershipCache do
 
   describe '#fetch_membership' do
     it 'returns false by default' do
-      cache.fetch_membership('foo', 'bar').should be_false
+      cache.fetch_membership('foo', 'bar').should be_falsey
     end
 
     context 'when cache valid' do
@@ -17,7 +17,7 @@ describe Warden::GitHub::MembershipCache do
       end
 
       it 'returns true' do
-        cache.fetch_membership('foo', 'bar').should be_true
+        cache.fetch_membership('foo', 'bar').should be_truthy
       end
 
       it 'does not invoke the block' do
@@ -34,7 +34,7 @@ describe Warden::GitHub::MembershipCache do
 
       context 'when no block given' do
         it 'returns false' do
-          cache.fetch_membership('foo', 'bar').should be_false
+          cache.fetch_membership('foo', 'bar').should be_falsey
         end
       end
 
@@ -51,12 +51,12 @@ describe Warden::GitHub::MembershipCache do
 
     it 'caches the value when block returns true' do
       cache.fetch_membership('foo', 'bar') { true }
-      cache.fetch_membership('foo', 'bar').should be_true
+      cache.fetch_membership('foo', 'bar').should be_truthy
     end
 
     it 'does not cache the value when block returns false' do
       cache.fetch_membership('foo', 'bar') { false }
-      cache.fetch_membership('foo', 'bar').should be_false
+      cache.fetch_membership('foo', 'bar').should be_falsey
     end
   end
 end

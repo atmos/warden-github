@@ -50,14 +50,14 @@ describe Warden::GitHub::User do
       context 'when user is not member' do
         it 'returns false' do
           stub_api(user, method, ['rails', user.login], false)
-          user.send(method, 'rails').should be_false
+          user.send(method, 'rails').should be_falsey
         end
       end
 
       context 'when user is member' do
         it 'returns true' do
           stub_api(user, method, ['rails', user.login], true)
-          user.send(method, 'rails').should be_true
+          user.send(method, 'rails').should be_truthy
         end
       end
     end
