@@ -15,6 +15,8 @@ module Example
       config.default_strategies :github
       config.scope_defaults :default, :config => GITHUB_CONFIG
     end
+    Warden::Manager.serialize_from_session { |key| puts 'lol'; Warden::GitHub::Verifier.new.deserialize(key) }
+    Warden::Manager.serialize_into_session { |user| puts 'wut'; Warden::GitHub::Verifier.new.serialize(user) }
 
     get '/' do
       erb :index

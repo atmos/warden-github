@@ -8,6 +8,7 @@ require 'warden/github/hook'
 require 'warden/github/config'
 require 'warden/github/membership_cache'
 require 'warden/github/session_serializer'
+require 'warden/github/verifier'
 
 require 'active_support/message_verifier'
 require 'securerandom'
