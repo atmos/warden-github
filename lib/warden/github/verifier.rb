@@ -1,6 +1,14 @@
 module Warden
   module GitHub
     class Verifier
+      def self.dump(user)
+        new.serialize(user)
+      end
+
+      def self.load(key)
+        new.deserialize(key)
+      end
+
       def serialize(user)
         cookie_verifier.generate(user)
       end
@@ -11,11 +19,11 @@ module Warden
         nil
       end
 
-      private
       def verifier_key
         self.class.verifier_key
       end
 
+      private
       def self.verifier_key
         @verifier_key ||= ENV['WARDEN_GITHUB_VERIFIER_SECRET'] || SecureRandom.hex
       end
