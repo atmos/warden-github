@@ -14,8 +14,9 @@ Gem::Specification.new do |s|
 
   s.rubyforge_project = "warden-github"
 
-  s.add_dependency "warden",    ">1.0"
-  s.add_dependency "octokit",   ">2.1.0"
+  s.add_dependency "warden",        ">1.0"
+  s.add_dependency "octokit",       ">2.1.0"
+  s.add_dependency "activesupport", ">3.0"
 
   s.add_development_dependency "rack",      "~>1.4.1"
   s.add_development_dependency "rake"
