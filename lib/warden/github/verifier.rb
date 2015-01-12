@@ -10,11 +10,13 @@ module Warden
       end
 
       def serialize(user)
-        cookie_verifier.generate(user)
+        cookie_verifier.generate(user.marshal_dump)
       end
 
       def deserialize(key)
-        cookie_verifier.verify(key)
+        User.new.tap do |u|
+          u.marshal_load(cookie_verifier.verify(key))
+        end
       rescue ::ActiveSupport::MessageVerifier::InvalidSignature
         nil
       end
@@ -29,7 +31,7 @@ module Warden
       end
 
       def cookie_verifier
-        @cookie_verifier ||= ::ActiveSupport::MessageVerifier.new(verifier_key, serializer: Marshal)
+        @cookie_verifier ||= ::ActiveSupport::MessageVerifier.new(verifier_key, serializer: JSON)
       end
     end
   end
