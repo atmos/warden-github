@@ -14,6 +14,8 @@ module Example
       config.failure_app = BadAuthentication
       config.default_strategies :github
       config.scope_defaults :default, :config => GITHUB_CONFIG
+      config.serialize_from_session { |key| Warden::GitHub::Verifier.load(key) }
+      config.serialize_into_session { |user| Warden::GitHub::Verifier.dump(user) }
     end
 
     get '/' do

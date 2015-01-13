@@ -53,8 +53,13 @@ use Warden::Manager do |config|
                                              :client_secret => 'barfoo',
                                              :scope         => 'user,repo',
                                              :redirect_uri  => '/admin/oauth/callback' }
+
+  config.serialize_from_session { |key| Warden::GitHub::Verifier.load(key) }
+  config.serialize_into_session { |user| Warden::GitHub::Verifier.dump(user) }
 end
 ```
+
+The two serialization methods store the API token in the session securely via the `WARDEN_GITHUB_VERIFIER_SECRET` environmental variable.
 
 ### Parameters
 
