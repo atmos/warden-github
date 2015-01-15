@@ -1,3 +1,4 @@
+require 'json'
 require 'warden'
 
 require 'warden/github/user'
