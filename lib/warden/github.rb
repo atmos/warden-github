@@ -1,5 +1,6 @@
 require 'json'
 require 'warden'
+require 'octokit'
 
 require 'warden/github/user'
 require 'warden/github/oauth'

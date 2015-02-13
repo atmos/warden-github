@@ -100,6 +100,23 @@ describe 'OAuth' do
         authenticated_uri.query.should eq 'foo=bar'
       end
     end
+
+    context 'with GitHub SSO and code was exchanged for an access token' do
+      it 'redirects back to the original path' do
+        stub_code_for_token_exchange
+        stub_user_retrieval
+
+        unauthenticated_response = get '/profile?foo=bar'
+        github_uri = redirect_uri(unauthenticated_response)
+        state = github_uri.query_values['state']
+
+        callback_response = get "/profile?code=#{code}&state=#{state}&browser_session_id=abcdefghijklmnop"
+        authenticated_uri = redirect_uri(callback_response)
+
+        authenticated_uri.path.should eq '/profile'
+        authenticated_uri.query.should eq 'foo=bar'
+      end
+    end
   end
 
   context 'when not inside OAuth flow' do

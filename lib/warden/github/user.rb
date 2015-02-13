@@ -1,11 +1,9 @@
-require 'octokit'
-
 module Warden
   module GitHub
-    class User < Struct.new(:attribs, :token)
+    class User < Struct.new(:attribs, :token, :browser_session_id, :browser_session_verified_at)
       ATTRIBUTES = %w[id login name gravatar_id avatar_url email company site_admin].freeze
 
-      def self.load(access_token)
+      def self.load(access_token, browser_session_id = nil)
         api  = Octokit::Client.new(:access_token => access_token)
         data =  { }
 
@@ -13,7 +11,7 @@ module Warden
           data[k.to_s] = v if ATTRIBUTES.include?(k.to_s)
         end
 
-        new(data, access_token)
+        new(data, access_token, browser_session_id, Time.now.utc.to_i)
       end
 
       def marshal_dump
@@ -69,6 +67,41 @@ module Warden
       # Returns: true if the authenticated user is a GitHub employee, false otherwise
       def site_admin?
         !!site_admin
+      end
+
+      # Identify if the browser session is still valid
+      #
+      # Returns: true if the browser session is still active or the GitHub API is unavailable
+      def browser_session_valid?(since = 120)
+        return true unless needs_browser_reverification?(since)
+        client = api
+        client.get("/user/sessions/active", :browser_session_id => browser_session_id)
+        self.browser_session_verified_at = Time.now.utc.to_i
+        client.last_response.status == 204
+      rescue Octokit::ServerError # GitHub API unavailable
+        true
+      rescue Octokit::ClientError => e # GitHub API failed
+        false
+      end
+
+      # Identify whether or not the browser has been reverified since a time
+      #
+      # since - The number of seconds since the last browser session verification
+      #
+      # Returns: true if the user is using single signout and needs to be
+      # reverified. false if it has been verified in a recent enough amount of
+      # time.
+      def needs_browser_reverification?(since = 120)
+        return false unless using_single_sign_out?
+        browser_session_verified_at &&
+          (browser_session_verified_at <= (Time.now.utc.to_i - since))
+      end
+
+      # Identify if the user is on a GitHub SSO property
+      #
+      # Returns: true if a browser_session_id is present, false otherwise.
+      def using_single_sign_out?
+        !(browser_session_id.nil? || browser_session_id == "")
       end
 
       # Access the GitHub API from Octokit

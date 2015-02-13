@@ -15,6 +15,10 @@ describe Warden::GitHub::User do
     described_class.new(default_attrs, token)
   end
 
+  let(:sso_user) do
+    described_class.new(default_attrs, token, "abcdefghijklmnop", Time.now.utc.to_i)
+  end
+
   describe '#token' do
     it 'returns the token' do
       user.token.should eq token
@@ -107,5 +111,48 @@ describe Warden::GitHub::User do
   # NOTE: This always passes on MRI 1.9.3 because of ruby bug #7627.
   it 'marshals correctly' do
     Marshal.load(Marshal.dump(user)).should eq user
+  end
+
+  describe 'single sign out' do
+    it "knows if the user is using single sign out" do
+      user.should_not be_using_single_sign_out
+      sso_user.should be_using_single_sign_out
+    end
+
+    it "identifies when browsers need to be reverified" do
+      sso_user.should_not be_needs_browser_reverification
+      sso_user.browser_session_verified_at = Time.now.utc.to_i - 300
+      sso_user.should be_needs_browser_reverification
+    end
+
+    context "browser reverification" do
+      before do
+        sso_user.browser_session_verified_at = Time.now.utc.to_i - 300
+      end
+
+      it "handles success" do
+        sso_user.should be_needs_browser_reverification
+        stub_user_session_request.to_return(:status => 204, :body => "", :headers => {})
+        sso_user.should be_browser_session_valid
+      end
+
+      it "handles failure" do
+        sso_user.should be_needs_browser_reverification
+        stub_user_session_request.to_return(:status => 403, :body => "", :headers => {})
+        sso_user.should_not be_browser_session_valid
+      end
+
+      it "handles GitHub being unavailable" do
+        sso_user.should be_needs_browser_reverification
+        stub_user_session_request.to_raise(Octokit::ServerError.new)
+        sso_user.should be_browser_session_valid
+      end
+
+      it "handles authentication failures" do
+        sso_user.should be_needs_browser_reverification
+        stub_user_session_request.to_return(:status => 403, :body => "", :headers => {})
+        sso_user.should_not be_browser_session_valid
+      end
+    end
   end
 end
