@@ -18,16 +18,24 @@ module Example
       config.serialize_into_session { |user| Warden::GitHub::Verifier.dump(user) }
     end
 
+    def verify_browser_session
+      if env['warden'].user && !env['warden'].user.browser_session_valid?(10)
+        env['warden'].logout
+      end
+    end
+
     get '/' do
       erb :index
     end
 
     get '/profile' do
+      verify_browser_session
       env['warden'].authenticate!
       erb :profile
     end
 
     get '/login' do
+      verify_browser_session
       env['warden'].authenticate!
       redirect '/'
     end
@@ -86,4 +94,14 @@ __END__
   <dd><%= env['warden'].user.team_member?(632) %></dd>
   <dt>GitHub Site Admin:</dt>
   <dd><%= env['warden'].user.site_admin? %></dd>
+  <% if env['warden'].user.using_single_sign_out? %>
+    <dt>GitHub Browser Session ID</dt>
+    <dd><%= env['warden'].user.browser_session_id %></dd>
+    <dt>GitHub Browser Session Valid</dt>
+    <dd><%= env['warden'].user.browser_session_valid?(10) %></dd>
+    <dt>GitHub Browser Session Verified At</dt>
+    <dd><%= Time.at(env['warden'].user.browser_session_verified_at) %></dd>
+    <dt>GitHub Browser Session Needs Reverification</dt>
+    <dd><%= env['warden'].user.needs_browser_reverification?(10) %></dd>
+  <% end %>
 </dl>
