@@ -2,6 +2,7 @@ require 'json'
 require 'warden'
 require 'octokit'
 
+require 'warden/github/sso'
 require 'warden/github/user'
 require 'warden/github/oauth'
 require 'warden/github/version'
