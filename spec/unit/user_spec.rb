@@ -16,7 +16,7 @@ describe Warden::GitHub::User do
   end
 
   let(:sso_user) do
-    described_class.new(default_attrs, token, "abcdefghijklmnop", Time.now.utc.to_i)
+    described_class.new(default_attrs, token, "abcdefghijklmnop")
   end
 
   describe '#token' do
@@ -119,37 +119,23 @@ describe Warden::GitHub::User do
       sso_user.should be_using_single_sign_out
     end
 
-    it "identifies when browsers need to be reverified" do
-      sso_user.should_not be_needs_browser_reverification
-      sso_user.browser_session_verified_at = Time.now.utc.to_i - 300
-      sso_user.should be_needs_browser_reverification
-    end
-
     context "browser reverification" do
-      before do
-        sso_user.browser_session_verified_at = Time.now.utc.to_i - 300
-      end
-
       it "handles success" do
-        sso_user.should be_needs_browser_reverification
         stub_user_session_request.to_return(:status => 204, :body => "", :headers => {})
         sso_user.should be_browser_session_valid
       end
 
       it "handles failure" do
-        sso_user.should be_needs_browser_reverification
-        stub_user_session_request.to_return(:status => 403, :body => "", :headers => {})
+        stub_user_session_request.to_return(:status => 404, :body => "", :headers => {})
         sso_user.should_not be_browser_session_valid
       end
 
       it "handles GitHub being unavailable" do
-        sso_user.should be_needs_browser_reverification
         stub_user_session_request.to_raise(Octokit::ServerError.new)
         sso_user.should be_browser_session_valid
       end
 
       it "handles authentication failures" do
-        sso_user.should be_needs_browser_reverification
         stub_user_session_request.to_return(:status => 403, :body => "", :headers => {})
         sso_user.should_not be_browser_session_valid
       end
