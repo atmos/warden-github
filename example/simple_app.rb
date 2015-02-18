@@ -2,6 +2,8 @@ require File.expand_path('../setup', __FILE__)
 
 module Example
   class SimpleApp < BaseApp
+    include Warden::GitHub::SSO
+
     enable :inline_templates
 
     GITHUB_CONFIG = {
@@ -98,10 +100,8 @@ __END__
     <dt>GitHub Browser Session ID</dt>
     <dd><%= env['warden'].user.browser_session_id %></dd>
     <dt>GitHub Browser Session Valid</dt>
-    <dd><%= env['warden'].user.browser_session_valid?(10) %></dd>
+    <dd><%= warden_github_sso_session_valid?(env['warden'].user, 10) %></dd>
     <dt>GitHub Browser Session Verified At</dt>
-    <dd><%= Time.at(env['warden'].user.browser_session_verified_at) %></dd>
-    <dt>GitHub Browser Session Needs Reverification</dt>
-    <dd><%= env['warden'].user.needs_browser_reverification?(10) %></dd>
+    <dd><%= Time.at(session[:warden_github_sso_session_verified_at]) %></dd>
   <% end %>
 </dl>
