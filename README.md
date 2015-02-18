@@ -143,6 +143,38 @@ If you're looking for an easy way to integrate this into a Sinatra or Rails appl
 - [sinatra_auth_github](https://github.com/atmos/sinatra_auth_github)
 - [warden-github-rails](https://github.com/fphilipe/warden-github-rails)
 
+## Single Sign Out
+
+OAuth applications owned by the GitHub organization are sent an extra browser parameter to ensure that the user remains logged in to github.com. Taking advantage of this is provided by a small module you include into your controller and a before filter. Your `ApplicationController` should resemble something like this.
+
+
+```ruby
+class ApplicationController < ActionController::Base
+  include Warden::GitHub::SSO
+
+  protect_from_forgery with: :exception
+
+  before_filter :verify_logged_in_user
+
+  helper_method :current_user
+
+  private
+
+  def verify_logged_in_user
+    unless current_user && warden_github_sso_session_valid?(current_user, 30)
+      request.env['warden'].logout
+      request.env['warden'].authenticate!
+    end
+  end
+
+  def current_user
+    github_user
+  end
+end
+```
+
+You can also see single sign out in action in the example app.
+
 ## Additional Information
 
 - [warden](https://github.com/hassox/warden)
