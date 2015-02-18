@@ -15,6 +15,10 @@ describe Warden::GitHub::User do
     described_class.new(default_attrs, token)
   end
 
+  let(:sso_user) do
+    described_class.new(default_attrs, token, "abcdefghijklmnop")
+  end
+
   describe '#token' do
     it 'returns the token' do
       user.token.should eq token
@@ -107,5 +111,34 @@ describe Warden::GitHub::User do
   # NOTE: This always passes on MRI 1.9.3 because of ruby bug #7627.
   it 'marshals correctly' do
     Marshal.load(Marshal.dump(user)).should eq user
+  end
+
+  describe 'single sign out' do
+    it "knows if the user is using single sign out" do
+      user.should_not be_using_single_sign_out
+      sso_user.should be_using_single_sign_out
+    end
+
+    context "browser reverification" do
+      it "handles success" do
+        stub_user_session_request.to_return(:status => 204, :body => "", :headers => {})
+        sso_user.should be_browser_session_valid
+      end
+
+      it "handles failure" do
+        stub_user_session_request.to_return(:status => 404, :body => "", :headers => {})
+        sso_user.should_not be_browser_session_valid
+      end
+
+      it "handles GitHub being unavailable" do
+        stub_user_session_request.to_raise(Octokit::ServerError.new)
+        sso_user.should be_browser_session_valid
+      end
+
+      it "handles authentication failures" do
+        stub_user_session_request.to_return(:status => 403, :body => "", :headers => {})
+        sso_user.should_not be_browser_session_valid
+      end
+    end
   end
 end

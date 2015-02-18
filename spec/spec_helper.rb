@@ -16,4 +16,9 @@ RSpec.configure do |config|
   def app
     Example.app
   end
+
+  def stub_user_session_request
+    stub_request(:get, "https://api.github.com/user/sessions/active?browser_session_id=abcdefghijklmnop").
+      with(:headers => {'Accept'=>'application/vnd.github.v3+json', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Authorization'=>'token the_token', 'Content-Type'=>'application/json', 'User-Agent'=>"Octokit Ruby Gem #{Octokit::VERSION}"})
+  end
 end
