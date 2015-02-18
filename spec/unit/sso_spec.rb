@@ -25,7 +25,7 @@ describe Warden::GitHub::SSO do
     FakeController.new
   end
 
-  describe "whatever" do
+  describe "warden_github_sso_session_valid?" do
     it "identifies when browsers need to be reverified" do
       subject.session[:warden_github_sso_session_verified_at] = Time.now.utc.to_i - 10
       subject.should be_warden_github_sso_session_valid(user)
