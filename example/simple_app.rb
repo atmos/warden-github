@@ -102,6 +102,6 @@ __END__
     <dt>GitHub Browser Session Valid</dt>
     <dd><%= warden_github_sso_session_valid?(env['warden'].user, 10) %></dd>
     <dt>GitHub Browser Session Verified At</dt>
-    <dd><%= Time.at(session[:warden_github_sso_session_verified_at]) %></dd>
+    <dd><%= Time.at(warden_github_sso_session_verified_at) %></dd>
   <% end %>
 </dl>
