@@ -156,19 +156,13 @@ class ApplicationController < ActionController::Base
 
   before_filter :verify_logged_in_user
 
-  helper_method :current_user
-
   private
 
   def verify_logged_in_user
-    unless current_user && warden_github_sso_session_valid?(current_user, 30)
+    unless github_user && warden_github_sso_session_valid?(github_user, 120)
       request.env['warden'].logout
       request.env['warden'].authenticate!
     end
-  end
-
-  def current_user
-    github_user
   end
 end
 ```
