@@ -21,7 +21,7 @@ module Example
     end
 
     def verify_browser_session
-      if env['warden'].user && !env['warden'].user.browser_session_valid?(10)
+      if env['warden'].user && !warden_github_sso_session_valid?(env['warden'].user, 10)
         env['warden'].logout
       end
     end
