@@ -113,6 +113,13 @@ describe Warden::GitHub::Config do
       end
     end
 
+    context 'when specified as an absolute uri' do
+      it 'retains the original uri but strips query and fragment' do
+        scope_config[:redirect_uri] = 'http://test1.example.com/callback?x=y#1'
+        config.redirect_uri.should eq 'http://test1.example.com/callback'
+      end
+    end
+
     context 'when specified in deprecated config' do
       it 'returns the expanded redirect uri' do
         warden_config[:github_callback_url] = '/callback'
