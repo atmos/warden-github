@@ -1,6 +1,6 @@
 module Warden
   module GitHub
-    class User < Struct.new(:attribs, :token, :browser_session_id)
+    class User < Struct.new(:attribs, :token, :browser_session_id, :memberships)
       ATTRIBUTES = %w[id login name gravatar_id avatar_url email company site_admin].freeze
 
       def self.load(access_token, browser_session_id = nil)
@@ -32,7 +32,7 @@ module Warden
       #
       # Returns: true if the user is publicized as an org member
       def organization_public_member?(org_name)
-        memberships.fetch_membership(:org_pub, org_name) do
+        membership_cache.fetch_membership(:org_pub, org_name) do
           api.organization_public_member?(org_name, login)
         end
       end
@@ -46,7 +46,7 @@ module Warden
       #
       # Returns: true if the user has access, false otherwise
       def organization_member?(org_name)
-        memberships.fetch_membership(:org, org_name) do
+        membership_cache.fetch_membership(:org, org_name) do
           api.organization_member?(org_name, login)
         end
       end
@@ -57,7 +57,7 @@ module Warden
       #
       # Returns: true if the user has access, false otherwise
       def team_member?(team_id)
-        memberships.fetch_membership(:team, team_id) do
+        membership_cache.fetch_membership(:team, team_id) do
           api.team_member?(team_id, login)
         end
       end
@@ -105,8 +105,9 @@ module Warden
 
       private
 
-      def memberships
-        attribs['member'] ||= MembershipCache.new
+      def membership_cache
+        self.memberships ||= {}
+        @membership_cache ||= MembershipCache.new(memberships)
       end
     end
   end
