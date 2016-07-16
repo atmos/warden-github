@@ -22,6 +22,10 @@ describe Warden::GitHub::MembershipCache do
         expect { |b| cache.fetch_membership('foo', 'bar', &b) }.
           to_not yield_control
       end
+
+      it 'converts type and id to strings' do
+        cache.fetch_membership(:foo, :bar).should be_truthy
+      end
     end
 
     context 'when cache expired' do
