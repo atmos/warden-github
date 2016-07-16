@@ -16,7 +16,7 @@ module Warden
       # cached for e certain time.
       def fetch_membership(type, id)
         type = type.to_s
-        id = id.to_s if id.is_a?(Symbol)
+        id = id.to_s
 
         if cached_membership_valid?(type, id)
           true
