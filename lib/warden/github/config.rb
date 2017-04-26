@@ -113,8 +113,12 @@ module Warden
       end
 
       def normalized_uri(uri_or_path)
-        uri = URI(request.url)
-        uri.path = extract_path(URI(uri_or_path))
+        uri = URI(uri_or_path)
+        unless uri.absolute?
+          path = extract_path(uri)
+          uri = URI(request.url)
+          uri.path = path
+        end
         uri.query = nil
         uri.fragment = nil
 
