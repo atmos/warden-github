@@ -24,7 +24,7 @@ describe Warden::GitHub::Config do
   end
 
   before do
-    config.stub(:request => request)
+    allow(config).to receive_messages(:request => request)
   end
 
   def silence_warnings
@@ -38,7 +38,7 @@ describe Warden::GitHub::Config do
     context 'when specified in scope config' do
       it 'returns the client id' do
         scope_config[:client_id] = 'foobar'
-        config.client_id.should eq 'foobar'
+        expect(config.client_id).to eq 'foobar'
       end
     end
 
@@ -46,15 +46,15 @@ describe Warden::GitHub::Config do
       it 'returns the client id' do
         warden_config[:github_client_id] = 'foobar'
         silence_warnings do
-          config.client_id.should eq 'foobar'
+          expect(config.client_id).to eq 'foobar'
         end
       end
     end
 
     context 'when specified in ENV' do
       it 'returns the client id' do
-        ENV.stub(:[]).with('GITHUB_CLIENT_ID').and_return('foobar')
-        config.client_id.should eq 'foobar'
+        allow(ENV).to receive(:[]).with('GITHUB_CLIENT_ID').and_return('foobar')
+        expect(config.client_id).to eq 'foobar'
       end
     end
 
@@ -69,7 +69,7 @@ describe Warden::GitHub::Config do
     context 'when specified in scope config' do
       it 'returns the client secret' do
         scope_config[:client_secret] = 'foobar'
-        config.client_secret.should eq 'foobar'
+        expect(config.client_secret).to eq 'foobar'
       end
     end
 
@@ -77,16 +77,16 @@ describe Warden::GitHub::Config do
       it 'returns the client secret' do
         warden_config[:github_secret] = 'foobar'
         silence_warnings do
-          config.client_secret.should eq 'foobar'
+          expect(config.client_secret).to eq 'foobar'
         end
       end
     end
 
     context 'when specified in ENV' do
       it 'returns the client secret' do
-        ENV.stub(:[]).with('GITHUB_CLIENT_SECRET').and_return('foobar')
+        allow(ENV).to receive(:[]).with('GITHUB_CLIENT_SECRET').and_return('foobar')
         silence_warnings do
-          config.client_secret.should eq 'foobar'
+          expect(config.client_secret).to eq 'foobar'
         end
       end
     end
@@ -102,14 +102,14 @@ describe Warden::GitHub::Config do
     context 'when specified in scope config' do
       it 'returns the expanded redirect uri' do
         scope_config[:redirect_uri] = '/callback'
-        config.redirect_uri.should eq 'http://example.com/callback'
+        expect(config.redirect_uri).to eq 'http://example.com/callback'
       end
     end
 
     context 'when specified path lacks leading slash' do
       it 'corrects the path and returns the expanded uri' do
         scope_config[:redirect_uri] = 'callback'
-        config.redirect_uri.should eq 'http://example.com/callback'
+        expect(config.redirect_uri).to eq 'http://example.com/callback'
       end
     end
 
@@ -117,40 +117,40 @@ describe Warden::GitHub::Config do
       it 'returns the expanded redirect uri' do
         warden_config[:github_callback_url] = '/callback'
         silence_warnings do
-          config.redirect_uri.should eq 'http://example.com/callback'
+          expect(config.redirect_uri).to eq 'http://example.com/callback'
         end
       end
     end
 
     context 'when not specified' do
       it 'returns the expanded redirect uri with the current path' do
-        config.redirect_uri.should eq 'http://example.com/the/path'
+        expect(config.redirect_uri).to eq 'http://example.com/the/path'
       end
     end
 
     context 'when HTTP_X_FORWARDED_PROTO is set to https' do
       it 'returns the expanded redirect uri(with port) with adjusted scheme' do
         env['HTTP_X_FORWARDED_PROTO'] = 'https'
-        request.stub(:url => 'http://example.com:443/the/path')
-        config.redirect_uri.should eq 'https://example.com/the/path'
+        allow(request).to receive_messages(:url => 'http://example.com:443/the/path')
+        expect(config.redirect_uri).to eq 'https://example.com/the/path'
       end
 
       it 'returns the expanded redirect uri with adjusted scheme including port 80' do
         env['HTTP_X_FORWARDED_PROTO'] = 'https'
-        request.stub(:url => 'http://example.com:80/the/path')
-        config.redirect_uri.should eq 'https://example.com/the/path'
+        allow(request).to receive_messages(:url => 'http://example.com:80/the/path')
+        expect(config.redirect_uri).to eq 'https://example.com/the/path'
       end
 
       it 'returns the expanded redirect uri with adjusted scheme including port 80 with multiple forwarded protocols' do
         env['HTTP_X_FORWARDED_PROTO'] = 'https,https'
-        request.stub(:url => 'https://example.com:80/the/path')
-        config.redirect_uri.should eq 'https://example.com/the/path'
+        allow(request).to receive_messages(:url => 'https://example.com:80/the/path')
+        expect(config.redirect_uri).to eq 'https://example.com/the/path'
       end
 
       it 'returns the expanded redirect uri(without port) with adjusted scheme' do
         env['HTTP_X_FORWARDED_PROTO'] = 'https'
-        request.stub(:url => 'http://example.com/the/path')
-        config.redirect_uri.should eq 'https://example.com/the/path'
+        allow(request).to receive_messages(:url => 'http://example.com/the/path')
+        expect(config.redirect_uri).to eq 'https://example.com/the/path'
       end
     end
   end
@@ -159,7 +159,7 @@ describe Warden::GitHub::Config do
     context 'when specified in scope config' do
       it 'returns the client secret' do
         scope_config[:scope] = 'user'
-        config.scope.should eq 'user'
+        expect(config.scope).to eq 'user'
       end
     end
 
@@ -167,14 +167,14 @@ describe Warden::GitHub::Config do
       it 'returns the client secret' do
         warden_config[:github_scopes] = 'user'
         silence_warnings do
-          config.scope.should eq 'user'
+          expect(config.scope).to eq 'user'
         end
       end
     end
 
     context 'when not specified' do
       it 'returns nil' do
-        config.scope.should be_nil
+        expect(config.scope).to be_nil
       end
     end
   end
@@ -187,8 +187,8 @@ describe Warden::GitHub::Config do
         :client_secret => '123',
         :redirect_uri  => '/foo')
 
-      config.to_hash.keys.
-        should =~ [:scope, :client_id, :client_secret, :redirect_uri]
+      expect(config.to_hash.keys).
+        to match_array([:scope, :client_id, :client_secret, :redirect_uri])
     end
   end
 end
