@@ -4,11 +4,11 @@ describe Warden::GitHub::Config do
   let(:warden_scope) { :test_scope }
 
   let(:env) do
-    { 'warden' => double(:config => warden_config) }
+    { 'warden' => double(config: warden_config) }
   end
 
   let(:warden_config) do
-    { :scope_defaults => { warden_scope => { :config => scope_config } } }
+    { scope_defaults: { warden_scope => { config: scope_config } } }
   end
 
   let(:scope_config) do
@@ -16,7 +16,7 @@ describe Warden::GitHub::Config do
   end
 
   let(:request) do
-    double(:url => 'http://example.com/the/path', :path => '/the/path')
+    double(url: 'http://example.com/the/path', path: '/the/path')
   end
 
   subject(:config) do
@@ -24,7 +24,7 @@ describe Warden::GitHub::Config do
   end
 
   before do
-    allow(config).to receive_messages(:request => request)
+    allow(config).to receive_messages(request: request)
   end
 
   def silence_warnings
@@ -131,25 +131,25 @@ describe Warden::GitHub::Config do
     context 'when HTTP_X_FORWARDED_PROTO is set to https' do
       it 'returns the expanded redirect uri(with port) with adjusted scheme' do
         env['HTTP_X_FORWARDED_PROTO'] = 'https'
-        allow(request).to receive_messages(:url => 'http://example.com:443/the/path')
+        allow(request).to receive_messages(url: 'http://example.com:443/the/path')
         expect(config.redirect_uri).to eq 'https://example.com/the/path'
       end
 
       it 'returns the expanded redirect uri with adjusted scheme including port 80' do
         env['HTTP_X_FORWARDED_PROTO'] = 'https'
-        allow(request).to receive_messages(:url => 'http://example.com:80/the/path')
+        allow(request).to receive_messages(url: 'http://example.com:80/the/path')
         expect(config.redirect_uri).to eq 'https://example.com/the/path'
       end
 
       it 'returns the expanded redirect uri with adjusted scheme including port 80 with multiple forwarded protocols' do
         env['HTTP_X_FORWARDED_PROTO'] = 'https,https'
-        allow(request).to receive_messages(:url => 'https://example.com:80/the/path')
+        allow(request).to receive_messages(url: 'https://example.com:80/the/path')
         expect(config.redirect_uri).to eq 'https://example.com/the/path'
       end
 
       it 'returns the expanded redirect uri(without port) with adjusted scheme' do
         env['HTTP_X_FORWARDED_PROTO'] = 'https'
-        allow(request).to receive_messages(:url => 'http://example.com/the/path')
+        allow(request).to receive_messages(url: 'http://example.com/the/path')
         expect(config.redirect_uri).to eq 'https://example.com/the/path'
       end
     end
@@ -182,10 +182,10 @@ describe Warden::GitHub::Config do
   describe '#to_hash' do
     it 'includes all configs' do
       scope_config.merge!(
-        :scope         => 'user',
-        :client_id     => 'abc',
-        :client_secret => '123',
-        :redirect_uri  => '/foo')
+        scope:         'user',
+        client_id:     'abc',
+        client_secret: '123',
+        redirect_uri:  '/foo')
 
       expect(config.to_hash.keys).
         to match_array([:scope, :client_id, :client_secret, :redirect_uri])

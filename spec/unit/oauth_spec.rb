@@ -2,10 +2,10 @@ require 'spec_helper'
 
 describe Warden::GitHub::OAuth do
   let(:default_attrs) do
-    { :state => 'abc',
-      :client_id => 'foo',
-      :client_secret => 'bar',
-      :redirect_uri => 'http://example.com/callback' }
+    { state: 'abc',
+      client_id: 'foo',
+      client_secret: 'bar',
+      redirect_uri: 'http://example.com/callback' }
   end
 
   def oauth(attrs=default_attrs)
@@ -26,9 +26,9 @@ describe Warden::GitHub::OAuth do
       end
     end
 
-    { :nil => nil, :empty => '' }.each do |desc, value|
+    { nil: nil, empty: '' }.each do |desc, value|
       it "does not contain the scope param if #{desc}" do
-        uri = oauth(default_attrs.merge(:scope => value)).authorize_uri
+        uri = oauth(default_attrs.merge(scope: value)).authorize_uri
 
         expect(uri.to_s).not_to include 'scope'
       end
@@ -38,19 +38,19 @@ describe Warden::GitHub::OAuth do
   describe '#access_token' do
     def expect_request(attrs={})
       stub_request(:post, %r{\/login\/oauth\/access_token$}).
-        with(:body => hash_including(attrs.fetch(:params, {}))).
-        to_return(:status => 200,
-                  :body => attrs.fetch(:answer, 'access_token=foobar'))
+        with(body: hash_including(attrs.fetch(:params, {}))).
+        to_return(status: 200,
+                  body: attrs.fetch(:answer, 'access_token=foobar'))
     end
 
     it 'exchanges the code for an access token' do
-      expect_request(:answer => 'access_token=the_token&token_type=bearer')
+      expect_request(answer: 'access_token=the_token&token_type=bearer')
 
       expect(oauth.access_token).to eq 'the_token'
     end
 
     it 'raises BadVerificationCode if no access token is returned' do
-      expect_request(:answer => 'error=bad_verification_code')
+      expect_request(answer: 'error=bad_verification_code')
 
       expect { oauth.access_token }.
         to raise_error(described_class::BadVerificationCode)
@@ -58,8 +58,8 @@ describe Warden::GitHub::OAuth do
 
     %w[ client_id client_secret code ].each do |name|
       it "performs a request containing the correct #{name} param" do
-        oauth(default_attrs.merge(:code => 'the_code')).tap do |o|
-          expect_request(:params => { name => o.send(name) })
+        oauth(default_attrs.merge(code: 'the_code')).tap do |o|
+          expect_request(params: { name => o.send(name) })
           o.access_token
         end
       end

@@ -31,11 +31,11 @@ describe Warden::GitHub::SSO do
       expect(subject).to be_warden_github_sso_session_valid(user)
 
       subject.session[:warden_github_sso_session_verified_at] = Time.now.utc.to_i - 300
-      stub_user_session_request.to_return(:status => 204, :body => "", :headers => {})
+      stub_user_session_request.to_return(status: 204, body: "", headers: {})
       expect(subject).to be_warden_github_sso_session_valid(user)
 
       subject.session[:warden_github_sso_session_verified_at] = Time.now.utc.to_i - 300
-      stub_user_session_request.to_return(:status => 404, :body => "", :headers => {})
+      stub_user_session_request.to_return(status: 404, body: "", headers: {})
       expect(subject).not_to be_warden_github_sso_session_valid(user)
     end
   end

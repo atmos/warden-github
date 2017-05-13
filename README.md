@@ -48,11 +48,11 @@ use Warden::Manager do |config|
   config.failure_app = BadAuthentication
   config.default_strategies :github
 
-  config.scope_defaults :default, :config => { :scope => 'user:email' }
-  config.scope_defaults :admin, :config => { :client_id     => 'foobar',
-                                             :client_secret => 'barfoo',
-                                             :scope         => 'user,repo',
-                                             :redirect_uri  => '/admin/oauth/callback' }
+  config.scope_defaults :default, config: { scope: 'user:email' }
+  config.scope_defaults :admin, config: { client_id:     'foobar',
+                                          client_secret: 'barfoo',
+                                          scope:         'user,repo',
+                                          redirect_uri:  '/admin/oauth/callback' }
 
   config.serialize_from_session { |key| Warden::GitHub::Verifier.load(key) }
   config.serialize_into_session { |user| Warden::GitHub::Verifier.dump(user) }

@@ -45,7 +45,7 @@ describe Warden::GitHub::User do
 
   def stub_api(user, method, args, ret)
     api = double
-    allow(user).to receive_messages(:api => api)
+    allow(user).to receive_messages(api: api)
     expect(api).to receive(method).with(*args).and_return(ret)
   end
 
@@ -71,7 +71,7 @@ describe Warden::GitHub::User do
     context 'when user is not member' do
       it 'returns false' do
         api = double()
-        allow(user).to receive_messages(:api => api)
+        allow(user).to receive_messages(api: api)
 
         allow(api).to receive(:team_member?).with(123, user.login).and_return(false)
 
@@ -82,7 +82,7 @@ describe Warden::GitHub::User do
     context 'when user is member' do
       it 'returns true' do
         api = double()
-        allow(user).to receive_messages(:api => api)
+        allow(user).to receive_messages(api: api)
         allow(api).to receive(:team_member?).with(123, user.login).and_return(true)
 
         expect(user).to be_team_member(123)
@@ -97,7 +97,7 @@ describe Warden::GitHub::User do
 
       expect(Octokit::Client).
         to receive(:new).
-        with(:access_token => token).
+        with(access_token: token).
         and_return(client)
       expect(client).to receive(:user).and_return(attrs)
 
@@ -121,12 +121,12 @@ describe Warden::GitHub::User do
 
     context "browser reverification" do
       it "handles success" do
-        stub_user_session_request.to_return(:status => 204, :body => "", :headers => {})
+        stub_user_session_request.to_return(status: 204, body: "", headers: {})
         expect(sso_user).to be_browser_session_valid
       end
 
       it "handles failure" do
-        stub_user_session_request.to_return(:status => 404, :body => "", :headers => {})
+        stub_user_session_request.to_return(status: 404, body: "", headers: {})
         expect(sso_user).not_to be_browser_session_valid
       end
 
@@ -136,7 +136,7 @@ describe Warden::GitHub::User do
       end
 
       it "handles authentication failures" do
-        stub_user_session_request.to_return(:status => 403, :body => "", :headers => {})
+        stub_user_session_request.to_return(status: 403, body: "", headers: {})
         expect(sso_user).not_to be_browser_session_valid
       end
     end

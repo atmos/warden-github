@@ -5,17 +5,17 @@ describe 'OAuth' do
 
   def stub_code_for_token_exchange(answer='access_token=the_token')
     stub_request(:post, 'https://github.com/login/oauth/access_token').
-      with(:body => hash_including(:code => code)).
-      to_return(:status => 200, :body => answer)
+      with(body: hash_including(code: code)).
+      to_return(status: 200, body: answer)
   end
 
   def stub_user_retrieval
     stub_request(:get, 'https://api.github.com/user').
-      with(:headers => { 'Authorization' => 'token the_token' }).
+      with(headers: { 'Authorization' => 'token the_token' }).
       to_return(
-        :status => 200,
-        :body => File.read('spec/fixtures/user.json'),
-        :headers => { 'Content-Type' => 'application/json; charset=utf-8' })
+        status: 200,
+        body: File.read('spec/fixtures/user.json'),
+        headers: { 'Content-Type' => 'application/json; charset=utf-8' })
   end
 
   def redirect_uri(response)
