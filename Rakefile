@@ -3,7 +3,7 @@ require 'rubygems/specification'
 require 'date'
 require 'bundler'
 
-task :default => [:spec]
+task default: [:spec]
 
 require 'rspec/core/rake_task'
 desc "Run specs"

@@ -28,15 +28,15 @@ describe Warden::GitHub::SSO do
   describe "warden_github_sso_session_valid?" do
     it "identifies when browsers need to be reverified" do
       subject.session[:warden_github_sso_session_verified_at] = Time.now.utc.to_i - 10
-      subject.should be_warden_github_sso_session_valid(user)
+      expect(subject).to be_warden_github_sso_session_valid(user)
 
       subject.session[:warden_github_sso_session_verified_at] = Time.now.utc.to_i - 300
-      stub_user_session_request.to_return(:status => 204, :body => "", :headers => {})
-      subject.should be_warden_github_sso_session_valid(user)
+      stub_user_session_request.to_return(status: 204, body: "", headers: {})
+      expect(subject).to be_warden_github_sso_session_valid(user)
 
       subject.session[:warden_github_sso_session_verified_at] = Time.now.utc.to_i - 300
-      stub_user_session_request.to_return(:status => 404, :body => "", :headers => {})
-      subject.should_not be_warden_github_sso_session_valid(user)
+      stub_user_session_request.to_return(status: 404, body: "", headers: {})
+      expect(subject).not_to be_warden_github_sso_session_valid(user)
     end
   end
 end

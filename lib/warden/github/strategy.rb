@@ -92,7 +92,7 @@ module Warden
 
       def oauth
         @oauth ||= OAuth.new(
-          config.to_hash.merge(:code => params['code'], :state => state))
+          config.to_hash.merge(code: params['code'], state: state))
       end
 
       def config

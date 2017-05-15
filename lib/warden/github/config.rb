@@ -43,10 +43,10 @@ module Warden
     #
     #     # This configures an additional scope that uses the github strategy
     #     # with custom configuration.
-    #     config.scope_defaults :admin, :config => { :client_id => 'foobar',
-    #                                                :client_secret => 'barfoo',
-    #                                                :scope => 'user,repo',
-    #                                                :redirect_uri => '/admin/oauth/callback' }
+    #     config.scope_defaults :admin, config: { client_id: 'foobar',
+    #                                             client_secret: 'barfoo',
+    #                                             scope: 'user,repo',
+    #                                             redirect_uri: '/admin/oauth/callback' }
     #   end
     class Config
       BadConfig = Class.new(StandardError)
@@ -88,10 +88,10 @@ module Warden
       end
 
       def to_hash
-        { :client_id     => client_id,
-          :client_secret => client_secret,
-          :redirect_uri  => redirect_uri,
-          :scope         => scope }
+        { client_id:     client_id,
+          client_secret: client_secret,
+          redirect_uri:  redirect_uri,
+          scope:         scope }
       end
 
       private

@@ -4,7 +4,7 @@ describe Warden::GitHub::MembershipCache do
   describe '#fetch_membership' do
     it 'returns false by default' do
       cache = described_class.new({})
-      cache.fetch_membership('foo', 'bar').should be_falsey
+      expect(cache.fetch_membership('foo', 'bar')).to be_falsey
     end
 
     context 'when cache valid' do
@@ -15,7 +15,7 @@ describe Warden::GitHub::MembershipCache do
       end
 
       it 'returns true' do
-        cache.fetch_membership('foo', 'bar').should be_truthy
+        expect(cache.fetch_membership('foo', 'bar')).to be_truthy
       end
 
       it 'does not invoke the block' do
@@ -24,7 +24,7 @@ describe Warden::GitHub::MembershipCache do
       end
 
       it 'converts type and id to strings' do
-        cache.fetch_membership(:foo, :bar).should be_truthy
+        expect(cache.fetch_membership(:foo, :bar)).to be_truthy
       end
     end
 
@@ -37,7 +37,7 @@ describe Warden::GitHub::MembershipCache do
 
       context 'when no block given' do
         it 'returns false' do
-          cache.fetch_membership('foo', 'bar').should be_falsey
+          expect(cache.fetch_membership('foo', 'bar')).to be_falsey
         end
       end
 
@@ -50,13 +50,13 @@ describe Warden::GitHub::MembershipCache do
     it 'caches the value when block returns true' do
       cache = described_class.new({})
       cache.fetch_membership('foo', 'bar') { true }
-      cache.fetch_membership('foo', 'bar').should be_truthy
+      expect(cache.fetch_membership('foo', 'bar')).to be_truthy
     end
 
     it 'does not cache the value when block returns false' do
       cache = described_class.new({})
       cache.fetch_membership('foo', 'bar') { false }
-      cache.fetch_membership('foo', 'bar').should be_falsey
+      expect(cache.fetch_membership('foo', 'bar')).to be_falsey
     end
   end
 
@@ -71,8 +71,8 @@ describe Warden::GitHub::MembershipCache do
     cache = described_class.new(hash)
 
     # Verify that existing data in the hash is used:
-    expect(cache.fetch_membership('foo', 'valid')).to be_true
-    expect(cache.fetch_membership('foo', 'timedout')).to be_false
+    expect(cache.fetch_membership('foo', 'valid')).to be(true)
+    expect(cache.fetch_membership('foo', 'timedout')).to be(false)
 
     # Add new data to the hash:
     cache.fetch_membership('foo', 'new') { true }
