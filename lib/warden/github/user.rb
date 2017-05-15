@@ -1,7 +1,9 @@
 module Warden
   module GitHub
-    class User < Struct.new(:attribs, :token, :browser_session_id, :memberships)
+    class User < Struct.new(:attribs, :token, :browser_session_id)
       ATTRIBUTES = %w[id login name gravatar_id avatar_url email company site_admin].freeze
+
+      attr_accessor :memberships
 
       def self.load(access_token, browser_session_id = nil)
         api  = Octokit::Client.new(access_token: access_token)
