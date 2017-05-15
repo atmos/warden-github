@@ -25,10 +25,10 @@ module Warden
       def authorize_uri
         @authorize_uri ||= build_uri(
           '/login/oauth/authorize',
-          :client_id => client_id,
-          :redirect_uri => redirect_uri,
-          :scope => scope,
-          :state => state)
+          client_id: client_id,
+          redirect_uri: redirect_uri,
+          scope: scope,
+          state: state)
       end
 
       def access_token
@@ -53,9 +53,9 @@ module Warden
       def access_token_uri
         @access_token_uri ||= build_uri(
           '/login/oauth/access_token',
-          :client_id => client_id,
-          :client_secret => client_secret,
-          :code => code)
+          client_id: client_id,
+          client_secret: client_secret,
+          code: code)
       end
 
       def build_uri(path, params)

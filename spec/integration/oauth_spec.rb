@@ -5,17 +5,17 @@ describe 'OAuth' do
 
   def stub_code_for_token_exchange(answer='access_token=the_token')
     stub_request(:post, 'https://github.com/login/oauth/access_token').
-      with(:body => hash_including(:code => code)).
-      to_return(:status => 200, :body => answer)
+      with(body: hash_including(code: code)).
+      to_return(status: 200, body: answer)
   end
 
   def stub_user_retrieval
     stub_request(:get, 'https://api.github.com/user').
-      with(:headers => { 'Authorization' => 'token the_token' }).
+      with(headers: { 'Authorization' => 'token the_token' }).
       to_return(
-        :status => 200,
-        :body => File.read('spec/fixtures/user.json'),
-        :headers => { 'Content-Type' => 'application/json; charset=utf-8' })
+        status: 200,
+        body: File.read('spec/fixtures/user.json'),
+        headers: { 'Content-Type' => 'application/json; charset=utf-8' })
   end
 
   def redirect_uri(response)
@@ -27,12 +27,12 @@ describe 'OAuth' do
       unauthenticated_response = get '/profile'
       github_uri = redirect_uri(unauthenticated_response)
 
-      github_uri.scheme.should eq 'https'
-      github_uri.host.should eq 'github.com'
-      github_uri.path.should eq '/login/oauth/authorize'
-      github_uri.query_values['client_id'].should =~ /\w+/
-      github_uri.query_values['state'].should =~ /\w+/
-      github_uri.query_values['redirect_uri'].should =~ /^http.*\/profile$/
+      expect(github_uri.scheme).to eq 'https'
+      expect(github_uri.host).to eq 'github.com'
+      expect(github_uri.path).to eq '/login/oauth/authorize'
+      expect(github_uri.query_values['client_id']).to match(/\w+/)
+      expect(github_uri.query_values['state']).to match(/\w+/)
+      expect(github_uri.query_values['redirect_uri']).to match(/^http.*\/profile$/)
     end
   end
 
@@ -53,8 +53,8 @@ describe 'OAuth' do
         get '/login'
         response = get "/login?code=#{code}&state=foobar"
 
-        response.should_not be_successful
-        response.body.should include 'State mismatch'
+        expect(response).not_to be_successful
+        expect(response.body).to include 'State mismatch'
       end
     end
 
@@ -67,8 +67,8 @@ describe 'OAuth' do
         state = github_uri.query_values['state']
         response = get "/login?code=#{code}&state=#{state}"
 
-        response.should_not be_successful
-        response.body.should include 'Bad verification code'
+        expect(response).not_to be_successful
+        expect(response.body).to include 'Bad verification code'
       end
     end
 
@@ -79,8 +79,8 @@ describe 'OAuth' do
         state = github_uri.query_values['state']
         response = get "/login?error=access_denied&state=#{state}"
 
-        response.should_not be_successful
-        response.body.should include 'access denied'
+        expect(response).not_to be_successful
+        expect(response.body).to include 'access denied'
       end
     end
 
@@ -96,8 +96,8 @@ describe 'OAuth' do
         callback_response = get "/profile?code=#{code}&state=#{state}"
         authenticated_uri = redirect_uri(callback_response)
 
-        authenticated_uri.path.should eq '/profile'
-        authenticated_uri.query.should eq 'foo=bar'
+        expect(authenticated_uri.path).to eq '/profile'
+        expect(authenticated_uri.query).to eq 'foo=bar'
       end
     end
 
@@ -113,8 +113,8 @@ describe 'OAuth' do
         callback_response = get "/profile?code=#{code}&state=#{state}&browser_session_id=abcdefghijklmnop"
         authenticated_uri = redirect_uri(callback_response)
 
-        authenticated_uri.path.should eq '/profile'
-        authenticated_uri.query.should eq 'foo=bar'
+        expect(authenticated_uri.path).to eq '/profile'
+        expect(authenticated_uri.query).to eq 'foo=bar'
       end
     end
   end
@@ -123,8 +123,8 @@ describe 'OAuth' do
     it 'does not recognize a seeming callback url as an actual callback' do
       response = get '/profile?state=foo&code=bar'
 
-      a_request(:post, 'https://github.com/login/oauth/access_token').
-        should have_not_been_made
+      expect(a_request(:post, 'https://github.com/login/oauth/access_token')).
+        to have_not_been_made
     end
   end
 
@@ -142,7 +142,7 @@ describe 'OAuth' do
       get authenticated_uri.path
       logged_in_response = get '/login'
 
-      redirect_uri(logged_in_response).path.should eq '/'
+      expect(redirect_uri(logged_in_response).path).to eq '/'
     end
   end
 end

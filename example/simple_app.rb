@@ -7,15 +7,15 @@ module Example
     enable :inline_templates
 
     GITHUB_CONFIG = {
-      :client_id     => ENV['GITHUB_CLIENT_ID']     || 'test_client_id',
-      :client_secret => ENV['GITHUB_CLIENT_SECRET'] || 'test_client_secret',
-      :scope         => 'user'
+      client_id:     ENV['GITHUB_CLIENT_ID']     || 'test_client_id',
+      client_secret: ENV['GITHUB_CLIENT_SECRET'] || 'test_client_secret',
+      scope:         'user'
     }
 
     use Warden::Manager do |config|
       config.failure_app = BadAuthentication
       config.default_strategies :github
-      config.scope_defaults :default, :config => GITHUB_CONFIG
+      config.scope_defaults :default, config: GITHUB_CONFIG
       config.serialize_from_session { |key| Warden::GitHub::Verifier.load(key) }
       config.serialize_into_session { |user| Warden::GitHub::Verifier.dump(user) }
     end
