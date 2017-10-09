@@ -43,10 +43,10 @@ module Warden
     #
     #     # This configures an additional scope that uses the github strategy
     #     # with custom configuration.
-    #     config.scope_defaults :admin, :config => { :client_id => 'foobar',
-    #                                                :client_secret => 'barfoo',
-    #                                                :scope => 'user,repo',
-    #                                                :redirect_uri => '/admin/oauth/callback' }
+    #     config.scope_defaults :admin, config: { client_id: 'foobar',
+    #                                             client_secret: 'barfoo',
+    #                                             scope: 'user,repo',
+    #                                             redirect_uri: '/admin/oauth/callback' }
     #   end
     class Config
       BadConfig = Class.new(StandardError)
@@ -88,10 +88,10 @@ module Warden
       end
 
       def to_hash
-        { :client_id     => client_id,
-          :client_secret => client_secret,
-          :redirect_uri  => redirect_uri,
-          :scope         => scope }
+        { client_id:     client_id,
+          client_secret: client_secret,
+          redirect_uri:  redirect_uri,
+          scope:         scope }
       end
 
       private
@@ -131,16 +131,21 @@ module Warden
         end
       end
 
+      def https_forwarded_proto?
+        env['HTTP_X_FORWARDED_PROTO'] &&
+          env['HTTP_X_FORWARDED_PROTO'].split(',')[0] == "https"
+      end
+
       def correct_scheme(uri)
-        if uri.scheme != 'https' && env['HTTP_X_FORWARDED_PROTO'] == 'https'
-          uri.port   = nil if uri.port == 80
+        if uri.scheme != 'https' && https_forwarded_proto?
           uri.scheme = 'https'
           # Reparsing will use a different URI subclass, namely URI::HTTPS which
           # knows the default port for https and strips it if present.
           uri = URI(uri.to_s)
         end
+        uri.port = nil if uri.port == 80
 
-        uri
+        URI(uri.to_s)
       end
     end
   end

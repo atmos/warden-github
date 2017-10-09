@@ -48,13 +48,18 @@ use Warden::Manager do |config|
   config.failure_app = BadAuthentication
   config.default_strategies :github
 
-  config.scope_defaults :default, :config => { :scope => 'user:email' }
-  config.scope_defaults :admin, :config => { :client_id     => 'foobar',
-                                             :client_secret => 'barfoo',
-                                             :scope         => 'user,repo',
-                                             :redirect_uri  => '/admin/oauth/callback' }
+  config.scope_defaults :default, config: { scope: 'user:email' }
+  config.scope_defaults :admin, config: { client_id:     'foobar',
+                                          client_secret: 'barfoo',
+                                          scope:         'user,repo',
+                                          redirect_uri:  '/admin/oauth/callback' }
+
+  config.serialize_from_session { |key| Warden::GitHub::Verifier.load(key) }
+  config.serialize_into_session { |user| Warden::GitHub::Verifier.dump(user) }
 end
 ```
+
+The two serialization methods store the API token in the session securely via the `WARDEN_GITHUB_VERIFIER_SECRET` environmental variable.
 
 ### Parameters
 
@@ -116,6 +121,7 @@ user.id          # => The GitHub user id.
 user.login       # => The GitHub username.
 user.name
 user.gravatar_id # => The md5 email hash to construct a gravatar image.
+user.avatar_url
 user.email       # => Requires user:email or user scope.
 user.company
 
@@ -136,6 +142,32 @@ If you're looking for an easy way to integrate this into a Sinatra or Rails appl
 
 - [sinatra_auth_github](https://github.com/atmos/sinatra_auth_github)
 - [warden-github-rails](https://github.com/fphilipe/warden-github-rails)
+
+## Single Sign Out
+
+OAuth applications owned by the GitHub organization are sent an extra browser parameter to ensure that the user remains logged in to github.com. Taking advantage of this is provided by a small module you include into your controller and a before filter. Your `ApplicationController` should resemble something like this.
+
+
+```ruby
+class ApplicationController < ActionController::Base
+  include Warden::GitHub::SSO
+
+  protect_from_forgery with: :exception
+
+  before_filter :verify_logged_in_user
+
+  private
+
+  def verify_logged_in_user
+    unless github_user && warden_github_sso_session_valid?(github_user, 120)
+      request.env['warden'].logout
+      request.env['warden'].authenticate!
+    end
+  end
+end
+```
+
+You can also see single sign out in action in the example app.
 
 ## Additional Information
 

@@ -70,6 +70,10 @@ module Warden
         elsif (error = params['error']) && !error.empty?
           abort_flow!(error.gsub(/_/, ' '))
         end
+
+        if params['browser_session_id']
+          custom_session['browser_session_id'] = params['browser_session_id']
+        end
       end
 
       def custom_session
@@ -77,7 +81,7 @@ module Warden
       end
 
       def load_user
-        User.load(oauth.access_token)
+        User.load(oauth.access_token, custom_session['browser_session_id'])
       rescue OAuth::BadVerificationCode => e
         abort_flow!(e.message)
       end
@@ -88,7 +92,7 @@ module Warden
 
       def oauth
         @oauth ||= OAuth.new(
-          config.to_hash.merge(:code => params['code'], :state => state))
+          config.to_hash.merge(code: params['code'], state: state))
       end
 
       def config

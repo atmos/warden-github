@@ -5,15 +5,15 @@ module Example
     enable :inline_templates
 
     GITHUB_CONFIG = {
-      :client_id     => ENV['GITHUB_CLIENT_ID']     || 'test_client_id',
-      :client_secret => ENV['GITHUB_CLIENT_SECRET'] || 'test_client_secret'
+      client_id:     ENV['GITHUB_CLIENT_ID']     || 'test_client_id',
+      client_secret: ENV['GITHUB_CLIENT_SECRET'] || 'test_client_secret'
     }
 
     use Warden::Manager do |config|
       config.failure_app = BadAuthentication
       config.default_strategies :github
-      config.scope_defaults :default, :config => GITHUB_CONFIG
-      config.scope_defaults :admin, :config => GITHUB_CONFIG.merge(:scope => 'user,notifications')
+      config.scope_defaults :default, config: GITHUB_CONFIG
+      config.scope_defaults :admin, config: GITHUB_CONFIG.merge(scope: 'user,notifications')
     end
 
     get '/' do
@@ -26,7 +26,7 @@ module Example
     end
 
     get '/admin/login' do
-      env['warden'].authenticate!(:scope => :admin)
+      env['warden'].authenticate!(scope: :admin)
       redirect '/'
     end
 

@@ -3,8 +3,12 @@ module Warden
     # A hash subclass that acts as a cache for organization and team
     # membership states. Only membership states that are true are cached. These
     # are invalidated after a certain time.
-    class MembershipCache < ::Hash
+    class MembershipCache
       CACHE_TIMEOUT = 60 * 5
+
+      def initialize(data)
+        @data = data
+      end
 
       # Fetches a membership status by type and id (e.g. 'org', 'my_company')
       # from cache. If no cached value is present or if the cached value
@@ -12,7 +16,7 @@ module Warden
       # cached for e certain time.
       def fetch_membership(type, id)
         type = type.to_s
-        id = id.to_s if id.is_a?(Symbol)
+        id = id.to_s
 
         if cached_membership_valid?(type, id)
           true
@@ -27,10 +31,10 @@ module Warden
       private
 
       def cached_membership_valid?(type, id)
-        timestamp = fetch(type).fetch(id)
+        timestamp = @data.fetch(type).fetch(id)
 
         if Time.now.to_i > timestamp + CACHE_TIMEOUT
-          fetch(type).delete(id)
+          @data.fetch(type).delete(id)
           false
         else
           true
@@ -40,7 +44,7 @@ module Warden
       end
 
       def cache_membership(type, id)
-        hash = self[type] ||= {}
+        hash = @data[type] ||= {}
         hash[id] = Time.now.to_i
       end
     end

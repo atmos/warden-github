@@ -1,19 +1,19 @@
-require 'octokit'
-
 module Warden
   module GitHub
-    class User < Struct.new(:attribs, :token)
-      ATTRIBUTES = %w[id login name gravatar_id email company site_admin].freeze
+    class User < Struct.new(:attribs, :token, :browser_session_id)
+      ATTRIBUTES = %w[id login name gravatar_id avatar_url email company site_admin].freeze
 
-      def self.load(access_token)
-        api  = Octokit::Client.new(:access_token => access_token)
+      attr_accessor :memberships
+
+      def self.load(access_token, browser_session_id = nil)
+        api  = Octokit::Client.new(access_token: access_token)
         data =  { }
 
         api.user.to_hash.each do |k,v|
           data[k.to_s] = v if ATTRIBUTES.include?(k.to_s)
         end
 
-        new(data, access_token)
+        new(data, access_token, browser_session_id)
       end
 
       def marshal_dump
@@ -34,7 +34,7 @@ module Warden
       #
       # Returns: true if the user is publicized as an org member
       def organization_public_member?(org_name)
-        memberships.fetch_membership(:org_pub, org_name) do
+        membership_cache.fetch_membership(:org_pub, org_name) do
           api.organization_public_member?(org_name, login)
         end
       end
@@ -48,7 +48,7 @@ module Warden
       #
       # Returns: true if the user has access, false otherwise
       def organization_member?(org_name)
-        memberships.fetch_membership(:org, org_name) do
+        membership_cache.fetch_membership(:org, org_name) do
           api.organization_member?(org_name, login)
         end
       end
@@ -59,7 +59,9 @@ module Warden
       #
       # Returns: true if the user has access, false otherwise
       def team_member?(team_id)
-        api.team_member?(team_id, login)
+        membership_cache.fetch_membership(:team, team_id) do
+          api.team_member?(team_id, login)
+        end
       end
 
       # Identify GitHub employees/staff members.
@@ -67,6 +69,27 @@ module Warden
       # Returns: true if the authenticated user is a GitHub employee, false otherwise
       def site_admin?
         !!site_admin
+      end
+
+      # Identify if the browser session is still valid
+      #
+      # Returns: true if the browser session is still active or the GitHub API is unavailable
+      def browser_session_valid?(since = 120)
+        return true unless using_single_sign_out?
+        client = api
+        client.get("/user/sessions/active", browser_session_id: browser_session_id)
+        client.last_response.status == 204
+      rescue Octokit::ServerError # GitHub API unavailable
+        true
+      rescue Octokit::ClientError => e # GitHub API failed
+        false
+      end
+
+      # Identify if the user is on a GitHub SSO property
+      #
+      # Returns: true if a browser_session_id is present, false otherwise.
+      def using_single_sign_out?
+        !(browser_session_id.nil? || browser_session_id == "")
       end
 
       # Access the GitHub API from Octokit
@@ -79,13 +102,14 @@ module Warden
         # Don't cache instance for now because of a ruby marshaling bug present
         # in MRI 1.9.3 (Bug #7627) that causes instance variables to be
         # marshaled even when explicitly specifying #marshal_dump.
-        Octokit::Client.new(:login => login, :access_token => token)
+        Octokit::Client.new(login: login, access_token: token)
       end
 
       private
 
-      def memberships
-        attribs['member'] ||= MembershipCache.new
+      def membership_cache
+        self.memberships ||= {}
+        @membership_cache ||= MembershipCache.new(memberships)
       end
     end
   end
